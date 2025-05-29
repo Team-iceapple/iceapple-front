@@ -12,6 +12,5 @@ html, body, #root {
 #root > div {
   width: 1280px;
   height: 720px;
-  overflow: hidden;
   background-color: #EEF7FA;
 }
