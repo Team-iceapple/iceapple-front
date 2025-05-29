@@ -1,9 +1,5 @@
 import { NavLink } from 'react-router-dom';
 import { Icon } from '@iconify/react';
-import homeIcon from '@iconify/icons-mdi/home';
-import megaphoneIcon from '@iconify/icons-mdi/megaphone';
-import calendarIcon from '@iconify/icons-mdi/calendar';
-import graduationCap from '@iconify/icons-mdi/school';
 import logo from '/logo.svg';
 import styles from './Sidebar.module.css';
 
@@ -20,7 +16,7 @@ const Sidebar = () => {
                         `${styles.link} ${isActive ? styles.active : ''}`
                     }
                 >
-                    <Icon icon={homeIcon} width="20" height="20" />
+                    <Icon icon="lucide:home" width="20" height="20" />
                     홈
                 </NavLink>
                 <NavLink
@@ -29,7 +25,7 @@ const Sidebar = () => {
                         `${styles.link} ${isActive ? styles.active : ''}`
                     }
                 >
-                    <Icon icon={megaphoneIcon} width="20" height="20" />
+                    <Icon icon="lucide:megaphone" width="20" height="20" />
                     공지사항
                 </NavLink>
                 <NavLink
@@ -38,7 +34,7 @@ const Sidebar = () => {
                         `${styles.link} ${isActive ? styles.active : ''}`
                     }
                 >
-                    <Icon icon={calendarIcon} width="20" height="20" />
+                    <Icon icon="lucide:calendar" width="20" height="20" />
                     회의실 예약
                 </NavLink>
                 <NavLink
@@ -47,7 +43,7 @@ const Sidebar = () => {
                         `${styles.link} ${isActive ? styles.active : ''}`
                     }
                 >
-                    <Icon icon={graduationCap} width="20" height="20" />
+                    <Icon icon="lucide:graduation-cap" width="20" height="20" />
                     졸업작품
                 </NavLink>
             </nav>
