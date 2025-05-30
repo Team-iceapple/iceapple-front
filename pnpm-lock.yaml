@@ -8,15 +8,15 @@ importers:
 
   .:
     dependencies:
-      dayjs:
-        specifier: ^1.11.13
-        version: 1.11.13
       '@iconify/icons-mdi':
         specifier: ^1.2.48
         version: 1.2.48
       '@iconify/react':
         specifier: ^6.0.0
         version: 6.0.0(react@19.1.0)
+      dayjs:
+        specifier: ^1.11.13
+        version: 1.11.13
       iceapple-front:
         specifier: 'link:'
         version: 'link:'
