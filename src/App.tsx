@@ -1,10 +1,9 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import Layout from './components/Layout';
+import Layout from './components/Layout/Layout.tsx';
 import Home from './pages/Home';
 import Notice from './pages/Notice';
 import Project from './pages/Project';
-import { Footer } from "./components/Footer/Footer";
 
 const App: React.FC = () => {
     return (
@@ -17,7 +16,6 @@ const App: React.FC = () => {
                 </Routes>
             </Layout>
         </Router>
-      <Footer />
     );
 };
 
