@@ -1,11 +1,25 @@
+import React from 'react';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import Layout from './components/Layout';
+import Home from './pages/Home';
+import Notice from './pages/Notice';
+import Project from './pages/Project';
 import { Footer } from "./components/Footer/Footer";
 
-function App() {
+const App: React.FC = () => {
     return (
-        <div>
-            <Footer />
-        </div>
+        <Router>
+            <Layout>
+                <Routes>
+                    <Route path="/" element={<Home />} />
+                    <Route path="/notice" element={<Notice />} />
+                    <Route path="/project" element={<Project />} />
+                </Routes>
+            </Layout>
+        </Router>
+      <Footer />
     );
-}
+};
+
 
 export default App;
