@@ -11,9 +11,13 @@
   },
   "dependencies": {
     "dayjs": "^1.11.13",
+    "@iconify/icons-mdi": "^1.2.48",
+    "@iconify/react": "^6.0.0",
     "iceapple-front": "link:",
+    "lucide-react": "^0.511.0",
     "react": "^19.1.0",
-    "react-dom": "^19.1.0"
+    "react-dom": "^19.1.0",
+    "react-router-dom": "^7.6.1"
   },
   "devDependencies": {
     "@eslint/js": "^9.25.0",
