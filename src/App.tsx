@@ -4,6 +4,7 @@ import Layout from './components/Layout';
 import Home from './pages/Home';
 import Notice from './pages/Notice';
 import Project from './pages/Project';
+import { Footer } from "./components/Footer/Footer";
 
 const App: React.FC = () => {
     return (
@@ -16,7 +17,9 @@ const App: React.FC = () => {
                 </Routes>
             </Layout>
         </Router>
+      <Footer />
     );
 };
+
 
 export default App;
