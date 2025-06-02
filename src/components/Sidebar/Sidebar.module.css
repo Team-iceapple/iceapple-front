@@ -42,18 +42,18 @@
 .nav {
     display: flex;
     flex-direction: column;
-    gap: 2vw;
+    gap: 1vw;
     width: 100%;
 }
 
 .link {
     font-size: 1.8vw;
     font-weight: 600;
-    padding: 15px;
+    padding: 1.5vw 1vw;
     border-radius: 9px;
     display: flex;
     align-items: center;
-    gap: 12px;
+    gap: 0.5vw;
     text-decoration: none;
     color: #333;
     background-color: transparent;
