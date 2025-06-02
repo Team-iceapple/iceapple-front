@@ -1,8 +1,8 @@
 .footer {
     background-color: #4399b5b2;
     border-radius: 10px;
-    height: 90px;
-    width: 94vw;
+    height: 12vh;
+    width: 98vw;
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -19,12 +19,17 @@
 }
 
 .footer-megaphone {
-    width: 24px;
-    height: 24px;
+    width: 2.5vw;
+    height: 2.5vw;
+}
+
+.notice-label {
+    font-size: 1.5vw;
+    font-weight: 600;
 }
 
 .footer-pin-body {
-    font-size: 16px;
+    font-size: 1.2vw;
     white-space: nowrap;
 }
 
@@ -41,12 +46,12 @@
 }
 
 .footer-date {
-    font-size: 16px;
+    font-size: 1.4vw;
     font-weight: 600;
 }
 
 .footer-time {
-    font-size: 14px;
+    font-size: 1.3vw;
     font-weight: 300;
 }
 
@@ -57,12 +62,12 @@
 }
 
 .weather-temp {
-    font-size: 16px;
+    font-size: 1.4vw;
     font-weight: 600;
 }
 
 .weather-desc {
-    font-size: 14px;
+    font-size: 1.3vw;
     font-weight: 300;
     display: flex;
     align-items: center;
@@ -70,6 +75,6 @@
 }
 
 .weather-icon {
-    width: 16px;
-    height: 16px;
+    width: 1.3vw;
+    height: 1.3vw;
 }
