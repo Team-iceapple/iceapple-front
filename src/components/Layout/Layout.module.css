@@ -3,8 +3,8 @@
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    height: 100vh;
-    gap: 20px;
+    /*height: 100vh;*/
+    gap: 1vw;
 }
 
 
@@ -12,12 +12,12 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    gap: 1%;
+    gap: 1vw;
 }
 
 .main {
     background-color: #FFFFFF;
     width: 80vw;
-    height: 70vh;
+    height: 83vh;
     border-radius: 9px;
 }

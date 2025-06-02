@@ -16,7 +16,7 @@ const Sidebar = () => {
                         `${styles.link} ${isActive ? styles.active : ''}`
                     }
                 >
-                    <Icon icon="lucide:home" width="20" height="20" />
+                    <Icon icon="lucide:home" className={styles.icon} />
                     홈
                 </NavLink>
                 <NavLink
@@ -25,7 +25,7 @@ const Sidebar = () => {
                         `${styles.link} ${isActive ? styles.active : ''}`
                     }
                 >
-                    <Icon icon="lucide:megaphone" width="20" height="20" />
+                    <Icon icon="lucide:megaphone" className={styles.icon} />
                     공지사항
                 </NavLink>
                 <NavLink
@@ -34,7 +34,7 @@ const Sidebar = () => {
                         `${styles.link} ${isActive ? styles.active : ''}`
                     }
                 >
-                    <Icon icon="lucide:calendar" width="20" height="20" />
+                    <Icon icon="lucide:calendar" className={styles.icon} />
                     회의실 예약
                 </NavLink>
                 <NavLink
@@ -43,7 +43,7 @@ const Sidebar = () => {
                         `${styles.link} ${isActive ? styles.active : ''}`
                     }
                 >
-                    <Icon icon="lucide:graduation-cap" width="20" height="20" />
+                    <Icon icon="lucide:graduation-cap" className={styles.icon} />
                     졸업작품
                 </NavLink>
             </nav>
