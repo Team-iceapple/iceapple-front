@@ -52,49 +52,39 @@ export const Footer = (): JSX.Element => {
     }, []);
 
     return (
-            <footer className={styles.footer}>
-                <div className={styles.state}>
-                    <div className={styles["state-group"]}>
-                        <div className={styles["footer-today"]}>
-                            <div className={styles["footer-date"]}>
-                                {now.format("YYYY년 M월 D일 dddd")}
-                            </div>
-                            <div className={styles["footer-time"]}>
-                                {now.format("A hh:mm:ss")}
-                            </div>
-                        </div>
+        <footer className={styles.footer}>
+            <div className={styles["notice-section"]}>
+                <img src={footerMegaphone} className={styles["footer-megaphone"]} />
+                <span className={styles["notice-label"]}>주요 공지사항</span>
+                <p className={styles["footer-pin-body"]}>
+                    [진로설계 수강생 필수] 2025학년도 1학기 핵심역량진단 실시 안내
+                </p>
+            </div>
 
-                        <div className={styles["footer-weather"]}>
-                            <div className={styles.div}>
-                                <div className={styles["text-wrapper"]}>
-                                    {weather?.description || "날씨 로딩 중"}
-                                </div>
-                                <img
-                                    src={`https://openweathermap.org/img/wn/${weather?.icon}@2x.png`}
-                                    alt="날씨 아이콘"
-                                    className={styles["footer-weather-icon"]}
-                                />
-                            </div>
-                            <div className={styles["footer-weather-temperature"]}>
-                                {weather ? `${weather.temp}°C` : ""}
-                            </div>
-                        </div>
+            <div className={styles["footer-right"]}>
+                <div className={styles["datetime"]}>
+                    <div className={styles["footer-date"]}>
+                        {now.format("YYYY년 M월 D일 dddd")}
                     </div>
-
-                    <div className={styles["pinNotice"]}>
-                        <p className={styles["footer-pin-body"]}>
-                            [진로설계 수강생 필수] 2025학년도 1학기 핵심역량진단 실시 안내
-                        </p>
-                        <div className={styles["footer-pin-header"]}>주요 공지사항</div>
+                    <div className={styles["footer-time"]}>
+                        {now.format("A hh:mm:ss")}
                     </div>
-
-                    <img
-                        className={styles["footer-megaphone"]}
-                        alt="Footer megaphone"
-                        src={footerMegaphone}
-                    />
                 </div>
-            </footer>
+                <div className={styles["weather"]}>
+                    <div className={styles["weather-temp"]}>{weather ? `${weather.temp}°C` : ""}</div>
+                    <div className={styles["weather-desc"]}>
+                        {weather?.description}
+                        {weather?.icon && (
+                            <img
+                                src={`https://openweathermap.org/img/wn/${weather.icon}.png`}
+                                alt="날씨 아이콘"
+                                className={styles["weather-icon"]}
+                            />
+                        )}
+                    </div>
+                </div>
+            </div>
+        </footer>
 
     );
 };

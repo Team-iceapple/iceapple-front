@@ -2,160 +2,74 @@
     background-color: #4399b5b2;
     border-radius: 10px;
     height: 90px;
-    position: fixed;
-    bottom: 20px;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 100%;
-    max-width: calc(100% - 60px);
-    z-index: 1000;
+    width: 94vw;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 24px;
+    box-sizing: border-box;
+    color: white;
+    font-family: 'Pretendard', sans-serif;
 }
 
-
-
-
-.footer .footer-weather {
-    height: 48px;
-    left: 157px;
-    position: absolute;
-    top: 0;
-    width: 154px;
+.notice-section {
+    display: flex;
+    align-items: center;
+    gap: 12px;
 }
 
-.footer .div {
-    height: 27px;
-    left: 0;
-    position: absolute;
-    top: 21px;
-    width: 150px;
+.footer-megaphone {
+    width: 24px;
+    height: 24px;
 }
 
-.footer .text-wrapper {
-    color: #ffffff;
-    font-family: "Pretendard-Light", Helvetica;
+.footer-pin-body {
     font-size: 16px;
-    font-weight: 300;
-    left: 0;
-    letter-spacing: 0;
-    line-height: 24px;
-    position: absolute;
+    white-space: nowrap;
+}
+
+.footer-right {
+    display: flex;
+    align-items: flex-end;
+    gap: 40px;
+}
+
+.datetime {
+    display: flex;
+    flex-direction: column;
     text-align: right;
-    top: 0;
-    white-space: nowrap;
-    width: 134px;
 }
 
-
-
-.footer .pinNotice {
-    height: 23px;
-    left: 63px;
-    position: absolute;
-    top: 36px;
-    width: 668px;
-}
-
-.footer .footer-pin-body {
-    color: #ffffff;
-    font-family: var(--body-b3-semibold-font-family);
-    font-size: var(--body-b3-semibold-font-size);
-    font-style: var(--body-b3-semibold-font-style);
-    font-weight: var(--body-b3-semibold-font-weight);
-    left: 0;
-    letter-spacing: var(--body-b3-semibold-letter-spacing);
-    line-height: var(--body-b3-semibold-line-height);
-    position: absolute;
-    text-align: center;
-    width: 668px;
-    transform: translateY(-16px);
-}
-
-.footer .footer-pin-header {
-    color: #ffffff;
-    font-family: var(--body-b2-bold-font-family);
-    font-size: var(--body-b2-bold-font-size);
-    font-style: var(--body-b2-bold-font-style);
-    font-weight: var(--body-b2-bold-font-weight);
-    left: 0;
-    letter-spacing: var(--body-b2-bold-letter-spacing);
-    line-height: var(--body-b2-bold-line-height);
-    position: absolute;
-    top: 0;
-    white-space: nowrap;
-    width: 138px;
-}
-
-.footer .footer-megaphone {
-    height: 30px;
-    left: 25px;
-    position: absolute;
-    top: 33px;
-    width: 30px;
-}
-
-.footer .state-group {
-    height: 53px;
-    left: 78%;
-    position: absolute;
-    top: 21px;
-    width: 311px;
-}
-
-.footer .footer-today {
-    height: 52px;
-    left: 0;
-    position: absolute;
-    top: 1px;
-    width: 249px;
-}
-
-.footer .footer-date {
-    color: #ffffff;
-    font-family: "Pretendard-SemiBold", Helvetica;
-    font-size: 20px;
-    font-weight: 600;
-    left: 0;
-    letter-spacing: 0;
-    line-height: normal;
-    position: absolute;
-    text-align: center;
-    top: 0;
-    width: 245px;
-}
-
-.footer .footer-time {
-    color: #ffffff;
-    font-family: "Pretendard-Light", Helvetica;
+.footer-date {
     font-size: 16px;
-    font-weight: 300;
-    left: 41px;
-    letter-spacing: 0;
-    line-height: normal;
-    position: absolute;
-    text-align: right;
-    top: 25px;
-    width: 180px;
-}
-
-.footer .footer-weather-icon {
-    height: 16px !important;
-    left: 134px !important;
-    position: absolute !important;
-    top: 3px !important;
-    width: 16px !important;
-}
-
-.footer .footer-weather-temperature{
-    color: #ffffff;
-    font-family: "Pretendard-SemiBold", Helvetica;
-    font-size: 20px;
     font-weight: 600;
-    left: 97px;
-    letter-spacing: 0;
-    line-height: normal;
-    position: absolute;
-    text-align: right;
-    top: 0;
-    white-space: nowrap;
-    width: 51px;
+}
+
+.footer-time {
+    font-size: 14px;
+    font-weight: 300;
+}
+
+.weather {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+}
+
+.weather-temp {
+    font-size: 16px;
+    font-weight: 600;
+}
+
+.weather-desc {
+    font-size: 14px;
+    font-weight: 300;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.weather-icon {
+    width: 16px;
+    height: 16px;
 }
