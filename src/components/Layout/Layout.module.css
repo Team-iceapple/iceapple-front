@@ -1,5 +1,10 @@
-.container{
-
+.layout {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    gap: 20px;
 }
 
 
@@ -7,12 +12,12 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    gap: 14px;
+    gap: 1%;
 }
 
 .main {
     background-color: #FFFFFF;
-    width: 1010px;
-    height: 580px;
+    width: 80vw;
+    height: 70vh;
     border-radius: 9px;
 }

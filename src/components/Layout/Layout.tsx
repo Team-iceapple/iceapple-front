@@ -14,8 +14,11 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
                 <main className={styles.main}>{children}</main>
                 <Sidebar />
             </div>
-            <Footer/>
+            <div className={styles.footerWrapper}>
+                <Footer />
+            </div>
         </div>
+
     );
 };
 
