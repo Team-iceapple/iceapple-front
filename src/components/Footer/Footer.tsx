@@ -1,20 +1,10 @@
 import footerMegaphone from "../../../assets/footer-megaphone.png";
 import styles from "./footer.module.css";
 
-import { useEffect, useState } from "react";
+import {type JSX, useEffect, useState} from "react";
 import dayjs from "dayjs";
 import 'dayjs/locale/ko';
 dayjs.locale('ko');
-
-interface WeatherData {
-    main: {
-        temp: number;
-    };
-    weather: {
-        description: string;
-        icon: string;
-    }[];
-}
 
 export const Footer = (): JSX.Element => {
     const [now, setNow] = useState(dayjs());

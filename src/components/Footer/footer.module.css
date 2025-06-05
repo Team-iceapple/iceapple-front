@@ -66,6 +66,7 @@
 .weather-temp {
     font-size: 1.4vw;
     font-weight: 600;
+    margin-right: 0.3vw;
 }
 
 .weather-desc {
