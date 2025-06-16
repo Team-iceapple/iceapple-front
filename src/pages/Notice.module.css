@@ -1,19 +1,24 @@
+.notice-container {
+    padding: 2.5vw 3vw;
+    font-family: "pretendard", sans-serif;
+}
+
+
 .notice-header {
-    margin-left: 4.0278vw;
-    margin-top: 3.8889vw;
-    margin-bottom: 1.0278vw;
     display: flex;
-    flex-direction: row;
+    align-items: center;
+    gap: 1vw;
 }
 
 .notice-header-icon {
-    width: 3.2639vw;
-    height: 3.2639vw;
+    font-size: 3.5vw;
+    color: #424242;
 }
 
 .notice-header-title {
-    font-size: 2.7083vw;
-    margin-left: 9px;
+    color: #424242;
+    font-size: 2.5vw;
+    font-weight: 700;
 }
 
 .notice-content {
@@ -52,8 +57,6 @@
 }
 
 .notice-content-created-at {
-    font-size: 1vw;
-    color: #666;
     min-width: 6vw;
     text-align: right;
 }

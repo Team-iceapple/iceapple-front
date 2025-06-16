@@ -1,5 +1,5 @@
 .projectContainer {
-    padding: 3vw;
+    padding: 2.5vw 3vw;
     font-family: "pretendard", sans-serif;
 }
 
@@ -22,7 +22,6 @@
     color: #424242;
     font-size: 2.5vw;
     font-weight: 700;
-    margin: 0;
 }
 
 .projectSubtitle {
