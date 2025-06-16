@@ -15,6 +15,8 @@ type NoticeItem = {
     title: string;
     createdAt: string;
     is_pin: boolean;
+    content: string;
+    has_attachment: boolean;
 };
 
 const chunk = <T,>(arr: T[], size: number): T[][] =>
@@ -45,12 +47,17 @@ const Notice = () => {
     };
 
     const selectedNotice = notices.find((n) => n.id === id);
-    const noticeChunks = chunk(notices, 6);
 
-    const numberedNotices = notices.map((notice, index) => ({
+    const pinned = notices.filter((n) => n.is_pin).slice(0,3);
+    const unpinned = notices.filter((n) => !n.is_pin);
+
+    const sorted = [...pinned, ...unpinned];
+
+    const numberedNotices = sorted.map((notice, index) => ({
         ...notice,
-        postNumber: notices.length - index,
+        postNumber: sorted.length - index,
     }));
+
     const numberedChunks = chunk(numberedNotices, 6);
 
     return (
@@ -90,9 +97,11 @@ const Notice = () => {
                                             {notice.postNumber}
                                         </div>
                                     )}
-                                    <p className={styles["notice-content-title"]}>
-                                        {notice.title}
-                                    </p>
+                                    <div>
+                                        <p className={styles["notice-content-title"]}>
+                                            {notice.title}
+                                        </p>
+                                    </div>
                                     <div className={styles["notice-content-created-at"]}>
                                         {notice.createdAt}
                                     </div>

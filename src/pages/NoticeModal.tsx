@@ -9,8 +9,9 @@ type Props = {
 type NoticeDetailDto = {
     id: string;
     title: string;
-    content: string; // HTML 포함 문자열
+    content: string;
     createdAt: string;
+    has_attachment: false;
 };
 
 const NoticeModal = ({ id, onClose }: Props) => {
@@ -47,6 +48,16 @@ const NoticeModal = ({ id, onClose }: Props) => {
         }
     }, [notice]);
 
+    const isEmptyHtml = (html: string | null | undefined): boolean => {
+        if (!html) return true;
+        const stripped = html
+            .replace(/<[^>]*>/g, '')
+            .replace(/&nbsp;/g, '')
+            .replace(/\s/g, '');
+        return stripped === '';
+    };
+
+
     if (error) return <div>{error}</div>;
     if (!notice) return <div></div>;
 
@@ -62,6 +73,17 @@ const NoticeModal = ({ id, onClose }: Props) => {
                     className={styles.content}
                     dangerouslySetInnerHTML={{ __html: notice.content }}
                 />
+                {notice.has_attachment && isEmptyHtml(notice.content) ? (
+                    <p className={styles["modal-notice-message"]}>
+                        웹에서 확인해주세요 (첨부파일 있음)
+                    </p>
+                ) : (
+                    <div
+                        className={styles["modal-notice-content"]}
+                        dangerouslySetInnerHTML={{ __html: notice.content }}
+                    />
+                )}
+
             </div>
         </div>
     );
