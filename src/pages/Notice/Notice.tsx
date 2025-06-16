@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import styles from "./Notice.module.css";
 import NoticeModal from "./NoticeModal";
+import ContentIcon from "../../assets/notice-content-icon.svg";
 import NoticePinIcon from "../../assets/notice-content-pin-icon.svg";
 
 import { Swiper, SwiperSlide } from "swiper/react";
@@ -62,10 +63,14 @@ const Notice = () => {
     const numberedChunks = chunk(numberedNotices, 6);
 
     return (
-        <div className={styles["notice-container"]}>
+        <>
             <div className={styles["notice-header"]}>
-                <Icon icon="lucide:megaphone" className={styles["notice-header-icon"]} />
-                <h1 className={styles["notice-header-title"]}>공지사항</h1>
+                <div className={styles["notice-header-icon"]}>
+                    <img src={ContentIcon} alt="공지 아이콘" />
+                </div>
+                <div className={styles["notice-header-title"]}>
+                    <b>공지사항</b>
+                </div>
             </div>
 
             <Swiper
@@ -114,9 +119,8 @@ const Notice = () => {
             {selectedNotice && (
                 <NoticeModal id={selectedNotice.id} onClose={closeModal} />
             )}
-        </div>
+        </>
     );
-
 };
 
 export default Notice;

@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import styles from "./NoticeModal.module.css";
+import styles from "./NoticeDetail.module.css";
 
 type Props = {
     id: string;
@@ -14,7 +14,7 @@ type NoticeDetailDto = {
     has_attachment: false;
 };
 
-const NoticeModal = ({ id, onClose }: Props) => {
+const NoticeDetail = ({ id, onClose }: Props) => {
     const [notice, setNotice] = useState<NoticeDetailDto | null>(null);
     const [error, setError] = useState<string | null>(null);
 
@@ -86,4 +86,4 @@ const NoticeModal = ({ id, onClose }: Props) => {
     );
 };
 
-export default NoticeModal;
+export default NoticeDetail;
