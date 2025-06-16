@@ -105,7 +105,7 @@ Iceapple 프로젝트의 Frontend 팀 레포지토리입니다.
 <br />
 
 ## 💁‍♂️ 프로젝트 팀원
-|Backend|Frontend|
+|Frontend|Frontend|
 |:---:|:---:|
 | ![](https://github.com/Hyehyun1001.png?size=120) | ![](https://github.com/wanyam2.png?size=120) |
 |[이혜현](https://github.com/Hyehyun1001)|[이은채](https://github.com/wanyam2)|
