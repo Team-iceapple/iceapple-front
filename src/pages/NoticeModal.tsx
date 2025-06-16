@@ -68,11 +68,7 @@ const NoticeModal = ({ id, onClose }: Props) => {
                 <h2>{notice.title}</h2>
                 <p className={styles.createdAt}>{notice.createdAt}</p>
                 <hr />
-                <div
-                    id="notice-content"
-                    className={styles.content}
-                    dangerouslySetInnerHTML={{ __html: notice.content }}
-                />
+
                 {notice.has_attachment && isEmptyHtml(notice.content) ? (
                     <p className={styles["modal-notice-message"]}>
                         웹에서 확인해주세요 (첨부파일 있음)
