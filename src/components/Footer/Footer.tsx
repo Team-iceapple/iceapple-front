@@ -25,7 +25,7 @@ export const Footer = (): JSX.Element => {
         const fetchWeather = async () => {
             try {
                 const res = await fetch(
-                    `https://api.openweathermap.org/data/2.5/weather?q=Seoul&units=metric&lang=kr&appid=e5a087bda87fdc9633fec66e11bfa928`
+                    `https://api.openweathermap.org/data/2.5/weather?q=Daejeon&units=metric&lang=kr&appid=e5a087bda87fdc9633fec66e11bfa928`
                 );
                 const data = await res.json();
                 setWeather({
