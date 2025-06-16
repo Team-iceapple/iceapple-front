@@ -101,7 +101,9 @@ const Notice = () => {
                                     )}
                                     <div>
                                         <p className={styles["notice-content-title"]}>
-                                            {notice.title}
+                                            {notice.title.length > 75
+                                                ? `${notice.title.slice(0, 70)}...`
+                                                : notice.title}
                                         </p>
                                     </div>
                                     <div className={styles["notice-content-created-at"]}>
