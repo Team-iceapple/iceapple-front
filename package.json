@@ -10,6 +10,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "dayjs": "^1.11.13",
     "@iconify/icons-mdi": "^1.2.48",
     "@iconify/react": "^6.0.0",
     "dayjs": "^1.11.13",

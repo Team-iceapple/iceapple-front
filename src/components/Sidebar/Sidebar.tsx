@@ -38,13 +38,13 @@ const Sidebar = () => {
                     회의실 예약
                 </NavLink>
                 <NavLink
-                    to="/project"
+                    to="/works"
                     className={({ isActive }) =>
                         `${styles.link} ${isActive ? styles.active : ''}`
                     }
                 >
                     <Icon icon="lucide:graduation-cap" className={styles.icon} />
-                    졸업작품
+                    프로젝트
                 </NavLink>
             </nav>
         </aside>
