@@ -1,4 +1,4 @@
-import footerMegaphone from "../../../assets/footer-megaphone.png";
+import footerMegaphone from "../../../assets/footer-megaphone.svg";
 import styles from "./footer.module.css";
 
 import {type JSX, useEffect, useState} from "react";

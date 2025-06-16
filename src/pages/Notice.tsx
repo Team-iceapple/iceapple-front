@@ -2,13 +2,15 @@ import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import styles from "./Notice.module.css";
 import NoticeModal from "./NoticeModal";
-import ContentIcon from "../../assets/notice-content-icon.png";
-import NoticePinIcon from "../../assets/notice-content-pin-icon.png";
+import ContentIcon from "../../assets/notice-content-icon.svg";
+import NoticePinIcon from "../../assets/notice-content-pin-icon.svg";
 
 import { Swiper, SwiperSlide } from "swiper/react";
 import "swiper/css";
 import "swiper/css/pagination";
 import { Pagination } from "swiper/modules";
+
+import { Icon } from "@iconify/react";
 
 type NoticeItem = {
     id: string;
