@@ -22,14 +22,14 @@
 }
 
 .notice-content {
-    background-color: #f8efe980;
+    background-color: rgba(228, 217, 199, 0.51);
     display: flex;
     flex-direction: row;
     align-items: center;
     width: 60.4167vw;
     height: 3.5417vw;
     margin-left: 9.2361vw;
-    margin-top: 1.5vw;
+    margin-top: 1.0vw;
     padding: 0 1vw;
     border-radius: 1.3889vw;
 }
@@ -62,5 +62,5 @@
 }
 
 .notice-slide-group {
-    margin-bottom: 3vw;
+    margin-bottom: 2vw;
 }
