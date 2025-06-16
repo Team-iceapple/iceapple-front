@@ -1,0 +1,56 @@
+.detailCard {
+    background-color: #f9f3ef;
+    padding: 2vw;
+    border-radius: 20px;
+    margin-top: 2vw;
+
+    max-height: 70vh;
+    overflow-y: auto;
+    scrollbar-width: thin;
+}
+
+.detailCard::-webkit-scrollbar {
+    width: 8px;
+}
+
+.detailCard::-webkit-scrollbar-thumb {
+    background-color: rgba(0, 0, 0, 0.2);
+    border-radius: 10px;
+}
+
+.detailHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+}
+
+.projectName {
+    font-size: 2vw;
+    color: #000000;
+    margin: 0;
+}
+
+.detailAuthors {
+    font-size: 1vw;
+    color: #444;
+    margin-top: 0.8vw;
+}
+
+.detailDivider {
+    margin: 1vw 0;
+    border: 0.5px solid #ccc;
+}
+
+.detailDescription {
+    font-size: 1vw;
+    color: #333;
+    white-space: pre-line;
+}
+
+.detailImage {
+    margin-top: 2vw;
+    width: 100%;
+    max-width: 900px;
+    border-radius: 12px;
+    display: block;
+}
