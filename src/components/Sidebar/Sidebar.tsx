@@ -35,7 +35,7 @@ const Sidebar = () => {
                     }
                 >
                     <Icon icon="lucide:calendar" className={styles.icon} />
-                    공간 예약
+                    회의실 예약
                 </NavLink>
                 <NavLink
                     to="/works"
