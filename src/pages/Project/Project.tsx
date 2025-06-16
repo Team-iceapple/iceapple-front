@@ -1,16 +1,38 @@
-import styles from "./Project.module.css";
+import { useState, useEffect } from 'react';
+import styles from './Project.module.css';
 import { Icon } from "@iconify/react";
 import { useNavigate } from "react-router-dom";
 
-// id를 포함한 프로젝트 목록 생성
-const projects = Array.from({ length: 20 }, (_, i) => ({
-    id: i + 1,
-    title: "실시간 협업 캔버스 히스토리 및 복원 시스템",
-    authors: "신보연, 이혜현, 임예은",
-}));
+type ProjectType = {
+    id: string;
+    name: string;
+    members: string[];
+    thumbnail: string;
+    year: number;
+};
 
 const Project = () => {
+    const [projects, setProjects] = useState<ProjectType[]>([]);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState<string | null>(null);
     const navigate = useNavigate();
+
+    useEffect(() => {
+        fetch(`${import.meta.env.VITE_API_BASE_URL}/project/works`)
+            .then(res => {
+                if (!res.ok) throw new Error(`HTTP ${res.status}`);
+                return res.json();
+            })
+            .then((data) => {
+                console.log("API 응답 데이터:", data);
+                setProjects(data.works);
+            })
+            .catch(err => setError(err.message))
+            .finally(() => setLoading(false));
+    }, []);
+
+    if (loading) return <div className={styles.projectContainer}>로딩 중...</div>;
+    if (error) return <div className={styles.projectContainer}>에러: {error}</div>;
 
     return (
         <div className={styles.projectContainer}>
@@ -23,17 +45,20 @@ const Project = () => {
             </div>
 
             <div className={styles.projectGrid}>
-                {projects.map((p) => (
+                {projects.map(p => (
                     <div
-                        className={styles.projectCard}
                         key={p.id}
+                        className={styles.projectCard}
                         onClick={() => navigate(`/works/${p.id}`)}
-                        style={{ cursor: "pointer" }}
+                        style={{ cursor: 'pointer' }}
                     >
-                        <div className={styles.projectImagePlaceholder} />
+                        <div className={styles.projectImagePlaceholder}>
+                            {/* 썸네일 이미지 예시 */}
+                            {/* <img src={p.thumbnail} alt={p.name} /> */}
+                        </div>
                         <div className={styles.projectInfo}>
-                            <p className={styles.projectName}>{p.title}</p>
-                            <p className={styles.projectAuthors}>{p.authors}</p>
+                            <p className={styles.projectName}>{p.name}</p>
+                            <p className={styles.projectAuthors}>{p.members.join(', ')}</p>
                         </div>
                     </div>
                 ))}

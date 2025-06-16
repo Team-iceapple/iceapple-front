@@ -1,30 +1,42 @@
+import { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import baseStyles from './Project.module.css';
 import detailStyles from './ProjectDetail.module.css';
 import { Icon } from '@iconify/react';
 
-const projectData: Record<string, {
-    title: string;
-    authors: string;
+type ProjectDetailType = {
+    id: string;
+    name: string;
+    members: string[];
     description: string;
-    image: string;
-}> = {
-    "1": {
-        title: "실시간 협업 캔버스 히스토리 및 복원 시스템",
-        authors: "신보연, 이혜현, 임예은",
-        description: `여러 사용자가 실시간으로 동시에 피피티를 편집할 수 있으며,
-슬라이드 별 히스토리 기능을 통해 이전 버전으로 되돌리는 기능을 제공합니다.`,
-        image: "/assets/project1.png",
-    }
+    pdf_url: string;
+    year: number;
 };
 
 const ProjectDetail = () => {
-    const { workid } = useParams();
-    const project = projectData[workid || ""];
+    const { workid } = useParams<{ workid: string }>();
+    const [project, setProject] = useState<ProjectDetailType | null>(null);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState<string | null>(null);
 
-    if (!project) {
-        return <div className={baseStyles.projectContainer}>존재하지 않는 프로젝트입니다.</div>;
-    }
+    useEffect(() => {
+        if (!workid) return;
+        fetch(`${import.meta.env.VITE_API_BASE_URL}/project/works/${workid}`)
+            .then(res => {
+                if (!res.ok) throw new Error(`HTTP ${res.status}`);
+                return res.json();
+            })
+            .then((data) => {
+                console.log("Detail response:", data); // 디버깅용
+                setProject(data.work); // ✅ work 필드에서 추출
+            })
+            .catch(err => setError(err.message))
+            .finally(() => setLoading(false));
+    }, [workid]);
+
+    if (loading) return <div className={baseStyles.projectContainer}>로딩 중...</div>;
+    if (error) return <div className={baseStyles.projectContainer}>에러: {error}</div>;
+    if (!project) return <div className={baseStyles.projectContainer}>존재하지 않는 프로젝트입니다.</div>;
 
     return (
         <div className={baseStyles.projectContainer}>
@@ -37,14 +49,14 @@ const ProjectDetail = () => {
 
             <div className={detailStyles.detailCard}>
                 <div className={detailStyles.detailHeader}>
-                    <h1 className={detailStyles.projectName}>{project.title}</h1>
-                    <p className={detailStyles.detailAuthors}>{project.authors}</p>
+                    <h1 className={detailStyles.projectName}>{project.name}</h1>
+                    <p className={detailStyles.detailAuthors}>{project.members.join(', ')}</p>
                 </div>
                 <hr className={detailStyles.detailDivider} />
                 <p className={detailStyles.detailDescription}>{project.description}</p>
                 <img
-                    src={project.image}
-                    alt="프로젝트 대표 이미지"
+                    src={`${import.meta.env.VITE_API_BASE_URL}/project/files/${project.pdf_url}`}
+                    alt="프로젝트 이미지"
                     className={detailStyles.detailImage}
                 />
             </div>
