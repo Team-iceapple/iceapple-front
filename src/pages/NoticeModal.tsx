@@ -75,6 +75,7 @@ const NoticeModal = ({ id, onClose }: Props) => {
                     </p>
                 ) : (
                     <div
+                        id="notice-content"
                         className={styles["modal-notice-content"]}
                         dangerouslySetInnerHTML={{ __html: notice.content }}
                     />
