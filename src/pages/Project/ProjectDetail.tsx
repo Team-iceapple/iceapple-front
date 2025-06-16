@@ -27,8 +27,8 @@ const ProjectDetail = () => {
                 return res.json();
             })
             .then((data) => {
-                console.log("Detail response:", data); // 디버깅용
-                setProject(data.work); // ✅ work 필드에서 추출
+                console.log("Detail response:", data);
+                setProject(data.work);
             })
             .catch(err => setError(err.message))
             .finally(() => setLoading(false));
