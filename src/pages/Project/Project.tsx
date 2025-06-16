@@ -24,7 +24,7 @@ const Project = () => {
                 return res.json();
             })
             .then((data) => {
-                console.log("API 응답 데이터:", data);
+                // console.log("API 응답 데이터:", data);
                 setProjects(data.works);
             })
             .catch(err => setError(err.message))
