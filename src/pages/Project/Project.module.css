@@ -1,0 +1,83 @@
+.projectContainer {
+    padding: 3vw;
+    font-family: "pretendard", sans-serif;
+}
+
+.header {
+    text-align: left;
+}
+
+.titleRow {
+    display: flex;
+    align-items: center;
+    gap: 1vw;
+}
+
+.icon {
+    font-size: 3.5vw;
+    color: #424242;
+}
+
+.projectTitle {
+    color: #424242;
+    font-size: 2.5vw;
+    font-weight: 700;
+    margin: 0;
+}
+
+.projectSubtitle {
+    font-size: 1.5vw;
+    color: #000000;
+    font-weight: 600;
+    margin-left: 4.5vw;
+}
+
+.projectGrid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(13vw, 1fr));
+    gap: 3vw;
+    justify-items: center;
+
+    max-height: 60vh;
+    overflow-y: auto;
+    padding-right: 0.5vw;
+}
+
+.projectGrid::-webkit-scrollbar {
+    width: 0.5vw;
+}
+.projectGrid::-webkit-scrollbar-thumb {
+    background-color: rgba(0, 0, 0, 0.2);
+    border-radius: 10px;
+}
+
+.projectCard {
+    background-color: rgba(243, 218, 201, 0.7);
+    border-radius: 12px;
+    overflow: hidden;
+    width: 15vw;
+}
+
+.projectImagePlaceholder {
+    width: 100%;
+    height: 8vw;
+    background-color: #FFFFFF;
+    opacity: 0.8;
+}
+
+.projectInfo {
+    padding: 0 0.5vw;
+}
+
+.projectName {
+    text-align: left;
+    font-size: 0.8vw;
+    font-weight: 600;
+    color: #333;
+}
+
+.projectAuthors {
+    text-align: right;
+    font-size: 0.65vw;
+    color: #777;
+}
