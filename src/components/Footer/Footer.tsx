@@ -34,7 +34,7 @@ export const Footer = (): JSX.Element => {
                     icon: data.weather[0].icon,
                 });
             } catch (err) {
-                console.error("날씨 뷸러오기 실패", err);
+                console.error("날씨 불러오기 실패", err);
             }
         };
 

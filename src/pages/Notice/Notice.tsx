@@ -33,11 +33,12 @@ const Notice = () => {
     useEffect(() => {
         fetch("http://localhost:3000/api/notice")
             .then((res) => res.json())
-            .then((data) => setNotices(data.notices))
-            .catch((err) => {
-                console.error("공지사항 로딩 실패:", err);
+            .then((data) => {
+                console.log("받은 공지:", data.notices);
+                setNotices(data.notices);
             });
     }, []);
+
 
     const handleClick = (noticeId: string) => {
         navigate(`/notice/${noticeId}`);
@@ -56,7 +57,7 @@ const Notice = () => {
 
     const numberedNotices = sorted.map((notice, index) => ({
         ...notice,
-        postNumber: sorted.length - index,
+        postNumber: sorted.length - index + 631,
     }));
 
     const numberedChunks = chunk(numberedNotices, 6);
