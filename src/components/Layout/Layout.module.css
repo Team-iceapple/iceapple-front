@@ -20,4 +20,6 @@
     width: 80vw;
     height: 83vh;
     border-radius: 9px;
+    overflow: hidden;
+
 }
