@@ -5,6 +5,7 @@ import Home from './pages/Home/Home.tsx';
 import Project from './pages/Project/Project.tsx';
 import ProjectDetail from "./pages/Project/ProjectDetail.tsx";
 import Notice from "./pages/Notice/Notice.tsx";
+import Room from "./pages/Room/Room.tsx";
 
 
 const App: React.FC = () => {
@@ -17,6 +18,7 @@ const App: React.FC = () => {
                     <Route path="/notice/:id" element={<Notice />} />
                     <Route path="/works" element={<Project />} />
                     <Route path="/works/:workid" element={<ProjectDetail />} />
+                    <Route path="/rooms" element={<Room />} />
                 </Routes>
             </Layout>
         </Router>
