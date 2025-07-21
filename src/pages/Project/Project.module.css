@@ -1,6 +1,7 @@
 .projectContainer {
     padding: 1.5vw 3vw;
     font-family: "pretendard", sans-serif;
+    position: relative;
 }
 
 .header {

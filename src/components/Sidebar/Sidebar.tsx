@@ -29,7 +29,7 @@ const Sidebar = () => {
                     공지사항
                 </NavLink>
                 <NavLink
-                    to="/room"
+                    to="/rooms"
                     className={({ isActive }) =>
                         `${styles.link} ${isActive ? styles.active : ''}`
                     }

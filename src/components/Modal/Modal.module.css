@@ -1,0 +1,91 @@
+.backdrop {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 120%;
+    background-color: rgba(255, 255, 255, 0.3);
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+}
+
+.modal {
+    background: white;
+    border-radius: 20px;
+    padding: 2vw 3vw;
+    width: 15vw;
+    height: 20vw;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+}
+
+.content {
+    width: 100%;
+    flex: 1;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.closeBtn {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: #4399B5;
+}
+
+.logo {
+    width: 5.5vw;
+    margin: 1.8vw 0;
+}
+
+.inputGroup {
+    display: flex;
+    flex-direction: column;
+    gap: 1vw;
+    width: 100%;
+}
+
+.input {
+    width: 100%;
+    padding: 0.8rem 1rem;
+    border: 1px solid #4399B5;
+    border-radius: 2rem;
+    font-size: 1rem;
+    outline: none;
+    box-sizing: border-box;
+}
+
+.buttonSection {
+    width: 100%;
+    margin-top: auto;
+    display: flex;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.submitBtn {
+    background-color: #4399B5;
+    color: white;
+    padding: 0.5vw 2vw;
+    border: none;
+    border-radius: 2rem;
+    font-size: 1rem;
+    cursor: pointer;
+}
+
+.errorText {
+    color: red;
+    font-size: 0.9rem;
+}
