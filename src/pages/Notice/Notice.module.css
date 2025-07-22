@@ -8,6 +8,7 @@
     display: flex;
     align-items: center;
     gap: 1vw;
+    margin-bottom: 2vw;
 }
 
 .notice-header-icon {
@@ -62,5 +63,5 @@
 }
 
 .notice-slide-group {
-    margin-bottom: 2vw;
+    margin-bottom: 5vw;
 }

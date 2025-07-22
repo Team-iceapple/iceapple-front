@@ -50,6 +50,7 @@ const Notice = () => {
 
 
 
+
     const handleClick = (noticeId: string) => {
         navigate(`/notice/${noticeId}`);
     };
@@ -67,7 +68,7 @@ const Notice = () => {
 
     const numberedNotices = sorted.map((notice, index) => ({
         ...notice,
-        postNumber: sorted.length - index,
+        postNumber: sorted.length - index + 631,
     }));
 
     const numberedChunks = chunk(numberedNotices, 6);

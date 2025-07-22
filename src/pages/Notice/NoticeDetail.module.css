@@ -49,3 +49,13 @@
     line-height: 1.6;
 }
 
+.qr-container {
+    text-align: center;
+    margin-top: 2rem;
+}
+
+.qr-container p {
+    font-size: 0.95rem;
+    margin-bottom: 1rem;
+    color: #555;
+}

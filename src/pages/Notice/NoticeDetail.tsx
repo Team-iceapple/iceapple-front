@@ -1,6 +1,8 @@
 import { useEffect, useState } from "react";
 import styles from "./NoticeDetail.module.css";
 
+import QRCode from "react-qr-code";
+
 type Props = {
     id: string;
     onClose: () => void;
@@ -80,7 +82,10 @@ const NoticeDetail = ({ id, onClose }: Props) => {
                         dangerouslySetInnerHTML={{ __html: notice.content }}
                     />
                 )}
-
+            </div>
+            <div className={styles["qr-container"]}>
+                <p>📱 모바일에서 확인하려면 QR을 스캔하세요</p>
+                <QRCode value={`${window.location.origin}/notice/${notice.id}`} size={128} />
             </div>
         </div>
     );
