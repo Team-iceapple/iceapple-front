@@ -21,7 +21,7 @@ const NoticeDetail = ({ id, onClose }: Props) => {
     const [error, setError] = useState<string | null>(null);
 
     useEffect(() => {
-        fetch(`http://localhost:3000/api/notice/${id}`)
+        fetch(`${import.meta.env.VITE_API_BASE_URL}notice/api/mobile/${id}`)
             .then((res) => {
                 if (!res.ok) throw new Error(`HTTP error ${res.status}`);
                 return res.json();
