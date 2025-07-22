@@ -31,13 +31,24 @@ const Notice = () => {
     const [notices, setNotices] = useState<NoticeItem[]>([]);
 
     useEffect(() => {
-        fetch("http://localhost:3000/api/notice")
-            .then((res) => res.json())
-            .then((data) => {
-                console.log("받은 공지:", data.notices);
-                setNotices(data.notices);
+        const url = `${import.meta.env.VITE_API_BASE_URL}notice/api/mobile`;
+        console.log("📡 실제 요청 URL:", url);
+
+        fetch(url)
+            .then(res => {
+                if (!res.ok) throw new Error(`HTTP ${res.status}`);
+                return res.json();
+            })
+            .then(data => {
+                console.log("📦 받은 공지사항:", data);
+                setNotices(data.mobiles);
+            })
+            .catch(err => {
+                console.error("❌ 공지사항 로딩 실패:", err);
             });
     }, []);
+
+
 
 
     const handleClick = (noticeId: string) => {

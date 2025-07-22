@@ -3,10 +3,15 @@ import styles from './Project.module.css';
 import { Icon } from "@iconify/react";
 import { useNavigate } from "react-router-dom";
 
+type MemberType = {
+    name: string;
+    extra: string;
+};
+
 type ProjectType = {
     id: string;
     name: string;
-    members: string[];
+    members: MemberType[];
     thumbnail: string;
     year: number;
 };
@@ -15,21 +20,24 @@ const Project = () => {
     const [projects, setProjects] = useState<ProjectType[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
+    const [selectedYear, setSelectedYear] = useState<number>(2026);
+    const [dropdownOpen, setDropdownOpen] = useState(false);
     const navigate = useNavigate();
 
     useEffect(() => {
-        fetch(`${import.meta.env.VITE_API_BASE_URL}/project/works`)
+        fetch(`${import.meta.env.VITE_API_BASE_URL}project/works`)
             .then(res => {
                 if (!res.ok) throw new Error(`HTTP ${res.status}`);
                 return res.json();
             })
             .then((data) => {
-                // console.log("API 응답 데이터:", data);
                 setProjects(data.works);
             })
             .catch(err => setError(err.message))
             .finally(() => setLoading(false));
     }, []);
+
+    const filteredProjects = projects.filter(p => p.year === selectedYear);
 
     if (loading) return <div className={styles.projectContainer}>로딩 중...</div>;
     if (error) return <div className={styles.projectContainer}>에러: {error}</div>;
@@ -41,11 +49,33 @@ const Project = () => {
                     <Icon icon="lucide:graduation-cap" className={styles.icon} />
                     <h1 className={styles.projectTitle}>졸업작품</h1>
                 </div>
-                <h2 className={styles.projectSubtitle}>2026 졸업</h2>
+                <div className={styles.yearDropdownWrapper}>
+                    <div
+                        className={styles.yearDropdownToggle}
+                        onClick={() => setDropdownOpen(!dropdownOpen)}
+                    >
+                        {selectedYear} <Icon icon="mdi:chevron-down" />
+                    </div>
+                    {dropdownOpen && (
+                        <ul className={styles.yearDropdownMenu}>
+                            {[2026, 2027].map(year => (
+                                <li
+                                    key={year}
+                                    onClick={() => {
+                                        setSelectedYear(year);
+                                        setDropdownOpen(false);
+                                    }}
+                                >
+                                    {year}
+                                </li>
+                            ))}
+                        </ul>
+                    )}
+                </div>
             </div>
 
             <div className={styles.projectGrid}>
-                {projects.map(p => (
+                {filteredProjects.map(p => (
                     <div
                         key={p.id}
                         className={styles.projectCard}
@@ -53,12 +83,17 @@ const Project = () => {
                         style={{ cursor: 'pointer' }}
                     >
                         <div className={styles.projectImagePlaceholder}>
-                            {/* 썸네일 이미지 예시 */}
-                            {/* <img src={p.thumbnail} alt={p.name} /> */}
+                            <img
+                                src={`${import.meta.env.VITE_API_BASE_URL}project/files/${p.thumbnail}`}
+                                alt={p.name}
+                                className={styles.projectImage}
+                            />
                         </div>
                         <div className={styles.projectInfo}>
                             <p className={styles.projectName}>{p.name}</p>
-                            <p className={styles.projectAuthors}>{p.members.join(', ')}</p>
+                            <p className={styles.projectAuthors}>
+                                {p.members.map(m => m.name).join(', ')}
+                            </p>
                         </div>
                     </div>
                 ))}

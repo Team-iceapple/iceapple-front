@@ -1,39 +1,42 @@
-.detailCard {
+.detailLayout {
+    display: flex;
+    gap: 2vw;
+    align-items: stretch;
+    flex-wrap: wrap;
+    height: 77vh;
+
+}
+
+.detailTextBox {
     background-color: #f9f3ef;
     padding: 2vw;
     border-radius: 20px;
-    margin-top: 2vw;
-
-    max-height: 55vh;
+    justify-content: space-between;
     overflow-y: auto;
     scrollbar-width: thin;
+    width: 45%;
 }
 
-.detailCard::-webkit-scrollbar {
+.detailTextBox::-webkit-scrollbar {
     width: 0.5vw;
 }
-
-.detailCard::-webkit-scrollbar-thumb {
+.detailTextBox::-webkit-scrollbar-thumb {
     background-color: rgba(0, 0, 0, 0.2);
     border-radius: 10px;
 }
 
-.detailHeader {
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-start;
-}
-
 .projectName {
     font-size: 2vw;
-    color: #000000;
+    color: #000;
     margin: 0;
 }
 
-.detailAuthors {
-    font-size: 1vw;
-    color: #444;
-    margin-top: 0.8vw;
+.teamName {
+    font-size: 1.1vw;
+    margin-top: 0.5vw;
+    color: #555;
+    text-align: right;
+    width: 100%;
 }
 
 .detailDivider {
@@ -47,10 +50,30 @@
     white-space: pre-line;
 }
 
-.detailImage {
+.memberBlock {
     display: block;
-    margin: 2vw auto;
-    width: 100%;
-    max-width: 900px;
-    border-radius: 12px;
+    gap: 2vw;
+    font-size: 0.95vw;
+    color: #444;
+    padding-bottom: 8vw;
+
+}
+
+.memberBlock ul {
+    margin: 0;
+    padding-left: 1.2vw;
+}
+
+.qrBox {
+    display: flex;
+    justify-content: center;
+}
+
+
+.detailImageBox {
+    width: 46.5%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }

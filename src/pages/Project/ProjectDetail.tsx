@@ -1,15 +1,22 @@
-import { useState, useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import baseStyles from './Project.module.css';
 import detailStyles from './ProjectDetail.module.css';
-import { Icon } from '@iconify/react';
+import { QRCodeSVG } from 'qrcode.react';
+
+type MemberType = {
+    name: string;
+    extra: string;
+};
 
 type ProjectDetailType = {
     id: string;
     name: string;
-    members: string[];
+    team_name: string;
+    members: MemberType[];
     description: string;
     pdf_url: string;
+    main_url: string;
     year: number;
 };
 
@@ -18,21 +25,39 @@ const ProjectDetail = () => {
     const [project, setProject] = useState<ProjectDetailType | null>(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
+    const [pdfBlobUrl, setPdfBlobUrl] = useState<string | null>(null);
 
     useEffect(() => {
         if (!workid) return;
-        fetch(`${import.meta.env.VITE_API_BASE_URL}/project/works/${workid}`)
-            .then(res => {
+
+        fetch(`${import.meta.env.VITE_API_BASE_URL}project/works/${workid}`)
+            .then((res) => {
                 if (!res.ok) throw new Error(`HTTP ${res.status}`);
                 return res.json();
             })
-            .then((data) => {
-                // console.log("Detail response:", data);
-                setProject(data.work);
-            })
-            .catch(err => setError(err.message))
+            .then((data) => setProject(data.work))
+            .catch((err) => setError(err.message))
             .finally(() => setLoading(false));
     }, [workid]);
+
+    useEffect(() => {
+        if (!project?.pdf_url) return;
+
+        const fileUrl = `${import.meta.env.VITE_API_BASE_URL}project/files/${project.pdf_url}`;
+        fetch(fileUrl, {
+            headers: {
+                Accept: "application/pdf"
+            }
+        })
+            .then(res => res.blob())
+            .then(blob => {
+                const url = URL.createObjectURL(blob);
+                setPdfBlobUrl(url);
+            })
+            .catch(err => {
+                console.error("PDF fetch 실패:", err);
+            });
+    }, [project?.pdf_url]);
 
     if (loading) return <div className={baseStyles.projectContainer}>로딩 중...</div>;
     if (error) return <div className={baseStyles.projectContainer}>에러: {error}</div>;
@@ -40,25 +65,41 @@ const ProjectDetail = () => {
 
     return (
         <div className={baseStyles.projectContainer}>
-            <div className={baseStyles.header}>
-                <div className={baseStyles.titleRow}>
-                    <Icon icon="lucide:graduation-cap" className={baseStyles.icon} />
-                    <h1 className={baseStyles.projectTitle}>졸업작품</h1>
-                </div>
-            </div>
+            <div className={detailStyles.detailLayout}>
 
-            <div className={detailStyles.detailCard}>
-                <div className={detailStyles.detailHeader}>
+                <div className={detailStyles.detailTextBox}>
                     <h1 className={detailStyles.projectName}>{project.name}</h1>
-                    <p className={detailStyles.detailAuthors}>{project.members.join(', ')}</p>
+                    <p className={detailStyles.teamName}>팀명: {project.team_name}</p>
+                    <hr className={detailStyles.detailDivider} />
+                    <p className={detailStyles.detailDescription}>{project.description}</p>
+
+                    <div className={detailStyles.memberBlock}>
+                        <strong>팀 정보</strong>
+                        <ul>
+                            {project.members.map((m, i) => (
+                                <li key={i}>
+                                    {m.name} {m.extra && `(${m.extra})`}
+                                </li>
+                            ))}
+                        </ul>
+                    </div>
+
+                    <div className={detailStyles.qrBox}>
+                        <QRCodeSVG value={project.main_url} style={{ width: '7vw', height: '7vw' }} />
+                    </div>
                 </div>
-                <hr className={detailStyles.detailDivider} />
-                <p className={detailStyles.detailDescription}>{project.description}</p>
-                <img
-                    src={`${import.meta.env.VITE_API_BASE_URL}/project/files/${project.pdf_url}`}
-                    alt="프로젝트 이미지"
-                    className={detailStyles.detailImage}
-                />
+
+                <div className={detailStyles.detailImageBox}>
+                    {pdfBlobUrl ? (
+                        <iframe
+                            src={pdfBlobUrl}
+                            title="PDF 미리보기"
+                            style={{ width: '100%', height: '100%', border: 'none' }}
+                        />
+                    ) : (
+                        <p>PDF를 불러오는 중입니다...</p>
+                    )}
+                </div>
             </div>
         </div>
     );
