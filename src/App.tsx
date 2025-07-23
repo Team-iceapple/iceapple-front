@@ -6,6 +6,7 @@ import Project from './pages/Project/Project.tsx';
 import ProjectDetail from "./pages/Project/ProjectDetail.tsx";
 import Notice from "./pages/Notice/Notice.tsx";
 import Room from "./pages/Room/Room.tsx";
+import RoomReservation from "./pages/Room/RoomReservation.tsx";
 
 
 const App: React.FC = () => {
@@ -19,6 +20,7 @@ const App: React.FC = () => {
                     <Route path="/works" element={<Project />} />
                     <Route path="/works/:workid" element={<ProjectDetail />} />
                     <Route path="/rooms" element={<Room />} />
+                    <Route path="/rooms/:roomId" element={<RoomReservation />} />
                 </Routes>
             </Layout>
         </Router>

@@ -64,7 +64,7 @@ const ProjectDetail = () => {
     if (!project) return <div className={baseStyles.projectContainer}>존재하지 않는 프로젝트입니다.</div>;
 
     return (
-        <div className={baseStyles.projectContainer}>
+        <div className={baseStyles.container}>
             <div className={detailStyles.detailLayout}>
 
                 <div className={detailStyles.detailTextBox}>

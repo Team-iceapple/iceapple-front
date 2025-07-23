@@ -19,8 +19,9 @@
     "pdfjs-dist": "^5.3.31",
     "qrcode.react": "^4.2.0",
     "react": "^19.1.0",
+    "react-calendar": "^6.0.0",
     "react-dom": "^19.1.0",
-    "react-qr-code": "^2.0.16",
+    "react-qr-code": "^2.0.18",
     "react-router-dom": "^7.6.1",
     "swiper": "^11.2.8"
   },

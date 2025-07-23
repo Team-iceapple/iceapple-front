@@ -1,0 +1,24 @@
+.Button {
+    height: 44px;
+    width: 89px;
+    background-color: #f3dac9b2;
+    border-radius: 13.75px;
+    border: none;
+    cursor: pointer;
+}
+
+.activeButton {
+    background-color: #d6b59fb2;
+}
+
+.buttonGroup {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 16px;
+}
+
+.calendarWrapper {
+    /*display: flex;*/
+    /*flex-direction: column;*/
+    /*align-items: center;*/
+}
