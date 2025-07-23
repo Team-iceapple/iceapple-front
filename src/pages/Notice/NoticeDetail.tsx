@@ -84,7 +84,7 @@ const NoticeDetail = ({ id, onClose }: Props) => {
                 )}
             </div>
             <div className={styles["qr-container"]}>
-                <p>📱 모바일에서 확인하려면 QR을 스캔하세요</p>
+                <p> &nbsp; 모바일에서 확인하려면 QR을 스캔하세요</p>
                 <QRCode value={`${window.location.origin}/notice/${notice.id}`} size={128} />
             </div>
         </div>
