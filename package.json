@@ -12,6 +12,7 @@
   "dependencies": {
     "@iconify/icons-mdi": "^1.2.48",
     "@iconify/react": "^6.0.0",
+    "bootstrap": "^5.3.7",
     "core-js": "^3.43.0",
     "dayjs": "^1.11.13",
     "iceapple-front": "link:",

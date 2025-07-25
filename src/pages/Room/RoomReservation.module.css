@@ -22,3 +22,21 @@
     /*flex-direction: column;*/
     /*align-items: center;*/
 }
+
+.layout {
+    display: flex;
+    gap: 24px;
+    align-items: flex-start;
+}
+
+.leftColumn {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.tableWrapper {
+    flex: 1;
+    min-width: 300px;
+}
