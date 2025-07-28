@@ -40,3 +40,12 @@
     flex: 1;
     min-width: 300px;
 }
+
+.timeRow {
+    background-color: rgba(248, 239, 233, 0.5);
+}
+
+.reservationButton {
+    text-align: center;
+    margin-top: 24px;
+}

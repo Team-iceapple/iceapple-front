@@ -12,7 +12,7 @@ import { timeSlots, mockAvailability as availability } from "../../data/reservat
 const RoomReservation = () => {
     const {roomId} = useParams<{ roomId: string }>();
     const [date, setDate] = useState(new Date());
-    const [selectedTime, setSelectedTime] = useState<string | null>(null);
+    const [selectedTime, setSelectedTime] = useState<string[]>([]);
     const navigate = useNavigate();
 
     return (
@@ -25,7 +25,6 @@ const RoomReservation = () => {
             </div>
 
             <div className={reservationStyles.layout}>
-                {/* 왼쪽: 버튼 + 캘린더 */}
                 <div className={reservationStyles.leftColumn}>
                     <div className={reservationStyles.buttonGroup}>
                         {rooms.map((r) => (
@@ -60,8 +59,8 @@ const RoomReservation = () => {
                 </div>
 
                 <div className={reservationStyles.tableWrapper}>
-                    <table className="table table-bordered table-hover align-middle">
-                        <thead className="table-light">
+                    <table className="table table-bordered table-hover align-middle text-center">
+                        <thead className="table-light" style={{ backgroundColor: "#EACDB7" }}>
                         <tr>
                             <th>선택</th>
                             <th>이용시간</th>
@@ -70,17 +69,25 @@ const RoomReservation = () => {
                         </thead>
                         <tbody>
                         {timeSlots.map((time, index) => (
-                            <tr key={index}>
-                                <td>
-                                    <div className="form-check">
+                            <tr key={index} className={reservationStyles.timeRow}>
+                            <td>
+                                    <div className="form-check d-flex justify-content-center">
                                         <input
                                             className="form-check-input"
-                                            type="radio"
-                                            name="selectedTime"
+                                            type="checkbox"
+                                            name="selectedTimes"
                                             id={`time-${index}`}
                                             value={time}
-                                            checked={selectedTime === time}
-                                            onChange={() => setSelectedTime(time)}
+                                            checked={selectedTime?.includes(time)}
+                                            onChange={() => {
+                                                if (!availability[time]) return;
+
+                                                setSelectedTime((prev) => {
+                                                    return prev.includes(time)
+                                                        ? prev.filter((t: string) => t !== time)
+                                                        : [...prev, time];
+                                                });
+                                            }}
                                             disabled={!availability[time]}
                                         />
                                     </div>
@@ -101,6 +108,11 @@ const RoomReservation = () => {
                         ))}
                         </tbody>
                     </table>
+                    <div className={reservationStyles.reservationButton}>
+                        <button className={reservationStyles.Button}>
+                            예약하기
+                        </button>
+                    </div>
                 </div>
             </div>
         </div>
