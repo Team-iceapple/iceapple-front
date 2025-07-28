@@ -36,6 +36,14 @@
     gap: 16px;
 }
 
+.customHeader th {
+    background-color: #EACDB7 !important;
+    color: #333 !important;
+}
+
+.timeRow td {
+    background-color: rgba(248, 239, 233, 0.5) !important;
+}
 .tableWrapper {
     flex: 1;
     min-width: 300px;

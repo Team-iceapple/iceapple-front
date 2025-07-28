@@ -9,3 +9,8 @@ export const mockAvailability: Record<string, boolean> = timeSlots.reduce((acc, 
     acc[slot] = idx % 2 === 0;
     return acc;
 }, {} as Record<string, boolean>);
+
+export const mockSeatCount: Record<string, number> = timeSlots.reduce((acc, slot) => {
+    acc[slot] = Math.floor(Math.random() * 6) + 5; // 5~10석
+    return acc;
+}, {} as Record<string, number>);

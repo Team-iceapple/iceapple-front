@@ -6,14 +6,15 @@ import baseStyles from "../Project/Project.module.css";
 import reservationStyles from "./RoomReservation.module.css";
 import {useState} from "react";
 import { rooms } from "../../data/rooms.ts"
-import { timeSlots, mockAvailability as availability } from "../../data/reservation";
-
+import { timeSlots, mockAvailability as availability, mockSeatCount as remainingSeats } from "../../data/reservation";
 
 const RoomReservation = () => {
     const {roomId} = useParams<{ roomId: string }>();
     const [date, setDate] = useState(new Date());
     const [selectedTime, setSelectedTime] = useState<string[]>([]);
     const navigate = useNavigate();
+    const isCapstoneRoom = roomId === "capstone";
+
 
     return (
         <div className={baseStyles.container}>
@@ -60,11 +61,12 @@ const RoomReservation = () => {
 
                 <div className={reservationStyles.tableWrapper}>
                     <table className="table table-bordered table-hover align-middle text-center">
-                        <thead className="table-light" style={{ backgroundColor: "#EACDB7" }}>
+                        <thead className={reservationStyles.customHeader}>
                         <tr>
                             <th>선택</th>
                             <th>이용시간</th>
                             <th>상태</th>
+                            {isCapstoneRoom && <th>잔여 좌석</th>}
                         </tr>
                         </thead>
                         <tbody>
@@ -104,6 +106,7 @@ const RoomReservation = () => {
                                         <span className="text-danger fw-semibold">예약됨</span>
                                     )}
                                 </td>
+                                {isCapstoneRoom && <td>{remainingSeats[time] ?? "-"}</td>}
                             </tr>
                         ))}
                         </tbody>
