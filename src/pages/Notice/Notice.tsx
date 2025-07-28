@@ -11,7 +11,7 @@ import { Pagination } from "swiper/modules";
 
 import { Icon } from "@iconify/react";
 
-type NoticeItem = {
+export type NoticeItem = {
     id: string;
     title: string;
     createdAt: string;
