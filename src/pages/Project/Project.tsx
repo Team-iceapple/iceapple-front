@@ -43,7 +43,7 @@ const Project = () => {
     if (error) return <div className={styles.projectContainer}>에러: {error}</div>;
 
     return (
-        <div className={styles.projectContainer}>
+        <div className={styles.container}>
             <div className={styles.header}>
                 <div className={styles.titleRow}>
                     <Icon icon="lucide:graduation-cap" className={styles.icon} />

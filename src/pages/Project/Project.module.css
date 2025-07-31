@@ -1,6 +1,5 @@
 .container {
     padding: 1.5vw 3vw;
-    font-family: "pretendard", sans-serif;
     position: relative;
 }
 
@@ -73,13 +72,11 @@
 
 .projectGrid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(13vw, 1fr));
+    grid-template-columns: repeat(4, 1fr);
     gap: 3vw;
     justify-items: center;
-    max-height: 60vh;
     overflow-y: auto;
-    padding-right: 0.5vw;
-    padding-top: 1vw;
+    padding-top: 5vw;
 }
 
 .projectGrid::-webkit-scrollbar {

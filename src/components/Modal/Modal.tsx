@@ -2,16 +2,24 @@ import { useState } from "react";
 import styles from "./Modal.module.css";
 import { Icon } from "@iconify/react";
 import LoginForm from "./LoginForm";
+import ReservationForm from "./ReservationModal";
 
-type ModalStep = "login" | "loginError";
+type ModalStep = "login" | "loginError" | "reservation";
 
 const Modal = ({
                    onClose,
                    initialStep = "login",
+                   date,
+                   selectedTimes,
+                   roomName,
                }: {
     onClose: () => void;
     initialStep?: ModalStep;
+    date?: Date;
+    selectedTimes?: string[];
+    roomName?: string;
 }) => {
+
     const [step, setStep] = useState<ModalStep>(initialStep);
     const [studentId, setStudentId] = useState("");
 
@@ -28,6 +36,12 @@ const Modal = ({
                         setStep={setStep}
                         studentId={studentId}
                         setStudentId={setStudentId}
+                    />
+                ) : step === "reservation" && date && selectedTimes && roomName ? (
+                    <ReservationForm
+                        date={date}
+                        selectedTimes={selectedTimes}
+                        roomName={roomName}
                     />
                 ) : null}
             </div>

@@ -1,10 +1,20 @@
+.layout {
+    display: flex;
+    gap: 24px;
+    align-items: flex-start;
+    margin: 0 4vw 0 4vw;
+}
+
 .Button {
-    height: 44px;
-    width: 89px;
+    height: 2.6vw;
+    width: 5.5vw;
     background-color: #f3dac9b2;
-    border-radius: 13.75px;
+    border-radius: 15px;
     border: none;
     cursor: pointer;
+    font-size: 0.9vw;
+    font-weight: 600;
+    color: #333333;
 }
 
 .activeButton {
@@ -13,20 +23,9 @@
 
 .buttonGroup {
     display: flex;
-    gap: 8px;
-    margin-bottom: 16px;
-}
-
-.calendarWrapper {
-    /*display: flex;*/
-    /*flex-direction: column;*/
-    /*align-items: center;*/
-}
-
-.layout {
-    display: flex;
-    gap: 24px;
-    align-items: flex-start;
+    gap: 0.5vw;
+    margin-top: 2vw;
+    margin-bottom: 2vw;
 }
 
 .leftColumn {
@@ -34,6 +33,20 @@
     display: flex;
     flex-direction: column;
     gap: 16px;
+}
+
+.calendarWrapper {
+    margin-left: 3vw;
+}
+
+.tableWrapper {
+    flex: 1;
+    max-width: 28vw;
+}
+
+.scaledTableWrapper {
+    transform: scale(1.1);
+    transform-origin: top right;
 }
 
 .customHeader th {
@@ -44,10 +57,6 @@
 .timeRow td {
     background-color: rgba(248, 239, 233, 0.5) !important;
 }
-.tableWrapper {
-    flex: 1;
-    min-width: 300px;
-}
 
 .timeRow {
     background-color: rgba(248, 239, 233, 0.5);
@@ -55,5 +64,7 @@
 
 .reservationButton {
     text-align: center;
-    margin-top: 24px;
+    margin-top: 6vw;
+    position: relative;
+    z-index: 1;
 }
