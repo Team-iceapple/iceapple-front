@@ -1,6 +1,8 @@
 import { useState } from "react";
 import styles from "./Modal.module.css";
-import logo from '/logo.svg';
+import Keyboard from "react-simple-keyboard";
+import "react-simple-keyboard/build/css/index.css";
+import logo from "/logo.svg";
 
 type Reservation = {
     id: string;
@@ -14,6 +16,9 @@ const ReservationManagerModal = () => {
     const [step, setStep] = useState<Step>("input");
     const [studentId, setStudentId] = useState("");
     const [password, setPassword] = useState("");
+    const [keyboardValue, setKeyboardValue] = useState("");
+    const [currentInput, setCurrentInput] = useState<"studentId" | "password" | null>(null);
+
     const [reservations, setReservations] = useState<Reservation[] | null>(null);
     const [selectedId, setSelectedId] = useState<string | null>(null);
     const [cancelMessage, setCancelMessage] = useState("");
@@ -37,13 +42,32 @@ const ReservationManagerModal = () => {
 
     const handleCancel = () => {
         if (selectedId && reservations) {
-            const selected = reservations.find(r => r.id === selectedId);
+            const selected = reservations.find((r) => r.id === selectedId);
             if (selected) {
-                setReservations(prev => prev?.filter(r => r.id !== selectedId) || []);
+                setReservations((prev) => prev?.filter((r) => r.id !== selectedId) || []);
                 setCancelMessage(`${studentId} 님의 ${selected.date} ${selected.time} 예약이 취소되었습니다.`);
                 setSelectedId(null);
                 setStep("cancelled");
             }
+        }
+    };
+
+    const handleKeyboardChange = (input: string) => {
+        setKeyboardValue(input);
+
+        if (currentInput === "studentId") {
+            setStudentId(input);
+        } else if (currentInput === "password") {
+            setPassword(input.slice(0, 4));
+        }
+    };
+
+    const handleKeyPress = (button: string) => {
+        if (button === "{bksp}") {
+            const updated = keyboardValue.slice(0, -1);
+            setKeyboardValue(updated);
+            if (currentInput === "studentId") setStudentId(updated);
+            else if (currentInput === "password") setPassword(updated);
         }
     };
 
@@ -57,21 +81,80 @@ const ReservationManagerModal = () => {
                             <input
                                 className={styles.input}
                                 placeholder="학번"
-                                value={studentId}
-                                onChange={(e) => setStudentId(e.target.value)}
+                                value={currentInput === "studentId" ? keyboardValue : studentId}
+                                onFocus={() => {
+                                    setCurrentInput("studentId");
+                                    setKeyboardValue(studentId);
+                                }}
+                                readOnly
                             />
                             <input
                                 className={styles.input}
                                 placeholder="간편 비밀번호 4자리"
                                 type="password"
-                                value={password}
-                                onChange={(e) => setPassword(e.target.value)}
+                                value={currentInput === "password" ? keyboardValue : password}
+                                onFocus={() => {
+                                    setCurrentInput("password");
+                                    setKeyboardValue(password);
+                                }}
+                                readOnly
                             />
                         </div>
-                        {errorMessage && (
-                            <p className={styles.errorText}>{errorMessage}</p>
-                        )}
+                        {errorMessage && <p className={styles.errorText}>{errorMessage}</p>}
                     </div>
+
+                    {/* 키보드: studentId용 일반 키보드 */}
+                    {currentInput === "studentId" && (
+                        <div className={styles.keyboardContainer}>
+                            <Keyboard
+                                inputName="studentId"
+                                onChange={handleKeyboardChange}
+                                onKeyPress={handleKeyPress}
+                                layout={{
+                                    default: [
+                                        "1 2 3 4 5 6 7 8 9 0",
+                                        "q w e r t y u i o p",
+                                        "a s d f g h j k l",
+                                        "z x c v b n m",
+                                        "{bksp} {space}"
+                                    ]
+                                }}
+                                display={{
+                                    "{bksp}": "⌫",
+                                    "{space}": "Space"
+                                }}
+                            />
+                        </div>
+                    )}
+
+                    {/* 키패드: password용 숫자 키패드 */}
+                    {currentInput === "password" && (
+                        <div className={styles.keypad}>
+                            <div className={styles.keypadGrid}>
+                                {[..."1234567890"].map((n) => (
+                                    <button
+                                        key={n}
+                                        onClick={() => {
+                                            const next = (password + n).slice(0, 4);
+                                            setPassword(next);
+                                            setKeyboardValue(next);
+                                        }}
+                                    >
+                                        {n}
+                                    </button>
+                                ))}
+                                <button
+                                    onClick={() => {
+                                        const next = password.slice(0, -1);
+                                        setPassword(next);
+                                        setKeyboardValue(next);
+                                    }}
+                                >
+                                    ⌫
+                                </button>
+                            </div>
+                        </div>
+                    )}
 
                     <div className={styles.buttonSection}>
                         <button className={styles.submitBtn} onClick={handleLookup}>
@@ -92,7 +175,7 @@ const ReservationManagerModal = () => {
                                 padding: "0.5vw",
                                 border: "1px solid #ddd",
                                 borderRadius: "0.5vw",
-                                cursor: "pointer",
+                                cursor: "pointer"
                             }}
                         >
                             <input

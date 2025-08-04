@@ -50,6 +50,9 @@ importers:
       react-router-dom:
         specifier: ^7.6.1
         version: 7.7.0(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
+      react-simple-keyboard:
+        specifier: ^3.8.103
+        version: 3.8.103(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
       swiper:
         specifier: ^11.2.8
         version: 11.2.10
@@ -1170,6 +1173,12 @@ packages:
     peerDependenciesMeta:
       react-dom:
         optional: true
+
+  react-simple-keyboard@3.8.103:
+    resolution: {integrity: sha512-tFRoqUWtUqlTaDZint0/9aKkWfSE5Yok86asUSEQglv1V4vj27w2vMaYAsrRVWZp1GuYQw4rZNrRUsu+y3hCCQ==}
+    peerDependencies:
+      react: ^16.0.0 || ^17.0.0 || ^18.0.0 || ^19.0.0
+      react-dom: ^16.0.0 || ^17.0.0 || ^18.0.0 || ^19.0.0
 
   react@19.1.0:
     resolution: {integrity: sha512-FS+XFBNvn3GTAWq26joslQgWNoFu08F4kl0J4CgdNKADkdSGXQyTCnKteIAJy96Br6YbpEU1LSzV5dYtjMkMDg==}
@@ -2322,6 +2331,11 @@ snapshots:
       react: 19.1.0
       set-cookie-parser: 2.7.1
     optionalDependencies:
+      react-dom: 19.1.0(react@19.1.0)
+
+  react-simple-keyboard@3.8.103(react-dom@19.1.0(react@19.1.0))(react@19.1.0):
+    dependencies:
+      react: 19.1.0
       react-dom: 19.1.0(react@19.1.0)
 
   react@19.1.0: {}
