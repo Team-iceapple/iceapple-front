@@ -49,7 +49,7 @@ const Room = () => {
             </div>
 
             {isModalOpen && (
-                <Modal onClose={() => setIsModalOpen(false)} initialStep="login" />
+                <Modal onClose={() => setIsModalOpen(false)} initialStep="manageReservation" />
             )}
 
         </div>
