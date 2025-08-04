@@ -1,10 +1,13 @@
-import { useState } from "react";
+import {useState} from "react";
 import styles from "./Modal.module.css";
-import { Icon } from "@iconify/react";
+import {Icon} from "@iconify/react";
 import LoginForm from "./LoginForm";
-import ReservationForm from "./ReservationModal";
+import ReservationForm from "./ReservationForm.tsx";
+import ReservationList from "./ReservationList.tsx";
+import CancelSuccess from "./CancelSuccess";
 
-type ModalStep = "login" | "loginError" | "reservation";
+
+type ModalStep = "login" | "loginError" | "reservation" | "reservationList" | "CancelSuccess";
 
 const Modal = ({
                    onClose,
@@ -22,12 +25,15 @@ const Modal = ({
 
     const [step, setStep] = useState<ModalStep>(initialStep);
     const [studentId, setStudentId] = useState("");
+    const [cancelledData, setCancelledData] = useState<
+        { date: string; times: string[]; room: string }[]
+    >([]);
 
     return (
         <div className={styles.backdrop} onClick={onClose}>
             <div className={styles.modal} onClick={(e) => e.stopPropagation()}>
                 <button className={styles.closeBtn} onClick={onClose}>
-                    <Icon icon="mdi:close" style={{ width: "1.6vw", height: "1.6vw" }} />
+                    <Icon icon="mdi:close" style={{width: "1.6vw", height: "1.6vw"}}/>
                 </button>
 
                 {step === "login" || step === "loginError" ? (
@@ -43,6 +49,14 @@ const Modal = ({
                         selectedTimes={selectedTimes}
                         roomName={roomName}
                     />
+                ) : step === "reservationList" ? (
+                    <ReservationList
+                        studentId={studentId}
+                        setStep={setStep}
+                        setCancelledData={setCancelledData}
+                    />
+                ) : step === "CancelSuccess" ? (
+                    <CancelSuccess studentId={studentId} cancelledReservations={cancelledData}/>
                 ) : null}
             </div>
         </div>
