@@ -131,14 +131,12 @@ const RoomReservation = () => {
                     <div className={reservationStyles.reservationButton}>
                         <button
                             className={reservationStyles.Button}
-                            onClick={() => {
-                                if (selectedTime.length > 0) {
-                                    setModalOpen(true); // 모달 열기
-                                }
-                            }}
+                            onClick={() => setModalOpen(true)}
+                            disabled={selectedTime.length === 0 || !date}
                         >
                             예약하기
                         </button>
+
                     </div>
                 </div>
             </div>
