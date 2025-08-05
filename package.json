@@ -24,6 +24,7 @@
     "react-dom": "^19.1.0",
     "react-qr-code": "^2.0.18",
     "react-router-dom": "^7.6.1",
+    "react-simple-keyboard": "^3.8.103",
     "swiper": "^11.2.8"
   },
   "devDependencies": {
