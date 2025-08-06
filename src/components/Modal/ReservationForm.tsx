@@ -1,5 +1,6 @@
-import {useState} from "react";
+import { useState } from "react";
 import styles from "./Modal.module.css";
+import NumberPad from "../NumberPad/NumberPad.tsx";
 
 const ReservationForm = ({
                              date,
@@ -15,6 +16,7 @@ const ReservationForm = ({
     const [password, setPassword] = useState("");
     const [isConfirmed, setIsConfirmed] = useState(false);
     const [showError, setShowError] = useState(false);
+    const [currentInput, setCurrentInput] = useState<"studentId" | "phone" | "password" | null>(null);
 
     const formattedDate = new Intl.DateTimeFormat("ko-KR", {
         month: "long",
@@ -83,32 +85,45 @@ const ReservationForm = ({
                 </div>
             </div>
 
-            <div style={{width: "100%"}}>
+            <div style={{ width: "100%" }}>
                 <div className={styles.inputGroup}>
                     <input
                         className={styles.input}
                         placeholder="학번"
                         value={studentId}
-                        onChange={(e) => setStudentId(e.target.value)}
+                        readOnly
+                        onFocus={() => setCurrentInput("studentId")}
                     />
                     <input
                         className={styles.input}
                         placeholder="전화번호"
                         value={phone}
-                        onChange={(e) => setPhone(e.target.value)}
+                        readOnly
+                        onFocus={() => setCurrentInput("phone")}
                     />
                     <input
                         className={styles.input}
                         placeholder="간편비밀번호 4자리"
                         type="password"
-                        maxLength={4}
                         value={password}
-                        onChange={(e) => setPassword(e.target.value)}
+                        readOnly
+                        onFocus={() => setCurrentInput("password")}
                     />
                 </div>
 
+                {/* 넘버패드 조건부 렌더링 */}
+                {currentInput === "studentId" && (
+                    <NumberPad value={studentId} setValue={setStudentId} maxLength={10} />
+                )}
+                {currentInput === "phone" && (
+                    <NumberPad value={phone} setValue={setPhone} maxLength={11} />
+                )}
+                {currentInput === "password" && (
+                    <NumberPad value={password} setValue={(v) => setPassword(v.slice(0, 4))} />
+                )}
+
                 <p className={styles.errorText}>
-                    {showError ? "모든 정보를 입력해주세요." : "\u00A0" }
+                    {showError ? "모든 정보를 입력해주세요." : "\u00A0"}
                 </p>
 
                 <div className={styles.buttonSection}>
