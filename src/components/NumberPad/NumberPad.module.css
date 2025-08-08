@@ -1,6 +1,7 @@
 .padContainer {
     width: 100%;
-    margin-top: 1.5rem;
+    margin-top: -19.5rem;
+    margin-left: 25rem;
     display: flex;
     justify-content: center;
 }
@@ -27,5 +28,5 @@
 
 .backspace {
     grid-column: span 3;
-    background-color: #ffc0c0;
+    background-color: #4399b5b2;
 }
