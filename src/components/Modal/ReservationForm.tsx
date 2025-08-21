@@ -1,37 +1,107 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import styles from "./Modal.module.css";
 import NumberPad from "../NumberPad/NumberPad.tsx";
+import axios, { AxiosError } from "axios";
 
-const ReservationForm = ({
-                             date,
-                             selectedTimes,
-                             roomName,
-                         }: {
+const API_BASE_URL = `${import.meta.env.VITE_API_BASE_URL}place/api`;
+
+type Props = {
     date: Date;
     selectedTimes: string[];
     roomName: string;
-}) => {
+    roomId: string;
+};
+
+const toYMD = (d: Date) => {
+    const yy = d.getFullYear();
+    const mm = String(d.getMonth() + 1).padStart(2, "0");
+    const dd = String(d.getDate()).padStart(2, "0");
+    return `${yy}-${mm}-${dd}T00:00:00`;
+};
+
+const timeToHour = (t: string) => parseInt(t.slice(0, 2), 10);
+
+const formatPhone = (raw: string) => {
+    const digits = raw.replace(/\D/g, "");
+    if (digits.length === 11) {
+        return `${digits.slice(0, 3)}-${digits.slice(3, 7)}-${digits.slice(7)}`;
+    }
+    if (digits.length === 10) {
+        return `${digits.slice(0, 3)}-${digits.slice(3, 6)}-${digits.slice(6)}`;
+    }
+    return raw;
+};
+
+const ReservationForm = ({ date, selectedTimes, roomName, roomId }: Props) => {
     const [studentId, setStudentId] = useState("");
     const [phone, setPhone] = useState("");
     const [password, setPassword] = useState("");
-    const [isConfirmed, setIsConfirmed] = useState(false);
-    const [showError, setShowError] = useState(false);
     const [currentInput, setCurrentInput] = useState<"studentId" | "phone" | "password" | null>(null);
 
-    const formattedDate = new Intl.DateTimeFormat("ko-KR", {
-        month: "long",
-        day: "numeric",
-        weekday: "short",
-    }).format(date);
+    const [submitting, setSubmitting] = useState(false);
+    const [showError, setShowError] = useState<string | null>(null);
+    const [isConfirmed, setIsConfirmed] = useState(false);
 
-    const handleSubmit = () => {
-        if (!studentId || !phone || password.length !== 4) {
-            setShowError(true);
+    const formattedDate = useMemo(
+        () =>
+            new Intl.DateTimeFormat("ko-KR", {
+                month: "long",
+                day: "numeric",
+                weekday: "short",
+            }).format(date),
+        [date]
+    );
+
+    const handleSubmit = async () => {
+        if (!/^\d{8}$/.test(studentId)) {
+            setShowError("학번을 올바르게 입력해주세요.");
+            return;
+        }
+        if (!/^\d{11}$/.test(phone)) {
+            setShowError("전화번호 11자리를 숫자로 입력해주세요.");
+            return;
+        }
+        if (!/^\d{4}$/.test(password)) {
+            setShowError("간편비밀번호 4자리를 입력해주세요.");
+            return;
+        }
+        if (selectedTimes.length === 0) {
+            setShowError("시간을 선택해주세요.");
             return;
         }
 
-        setShowError(false);
-        setIsConfirmed(true);
+        const times = Array.from(new Set(selectedTimes.map(timeToHour))).sort((a, b) => a - b);
+
+        const payload = {
+            student_number: studentId,
+            phone_number: formatPhone(phone),
+            password,
+            place_id: roomId,
+            date: toYMD(date),
+            times,
+        };
+
+        setShowError(null);
+        setSubmitting(true);
+        try {
+            await axios.post(`${API_BASE_URL}/reservations`, payload, {
+                headers: {
+                    "Content-Type": "application/json",
+                    Accept: "application/json",
+                },
+            });
+
+            setIsConfirmed(true);
+        } catch (err) {
+            const axiosErr = err as AxiosError<{ message?: string }>;
+            const msg =
+                axiosErr.response?.data?.message ||
+                "예약에 실패했습니다. 입력 정보를 다시 확인해주세요.";
+            setShowError(msg);
+            console.error("예약 실패", payload, axiosErr);
+        } finally {
+            setSubmitting(false);
+        }
     };
 
     if (isConfirmed) {
@@ -42,14 +112,11 @@ const ReservationForm = ({
                 <div className={styles.confirmationDetails}>
                     <strong>{formattedDate}</strong>
 
-                    {selectedTimes.map((_, i) =>
-                        i % 2 === 0 ? (
-                            <div key={i} className={styles.timeRow}>
-                                <span>{selectedTimes[i]}</span>
-                                {selectedTimes[i + 1] && <span>, {selectedTimes[i + 1]}</span>}
-                            </div>
-                        ) : null
-                    )}
+                    {selectedTimes.map((time, i) => (
+                        <div key={i} className={styles.timeRow}>
+                            {time}
+                        </div>
+                    ))}
 
                     <div className={styles.roomText}>
                         <strong>{roomName}</strong>
@@ -79,7 +146,7 @@ const ReservationForm = ({
                 <div className={styles.roomColumn}>
                     {selectedTimes.map((_, index) => (
                         <div key={index} className={styles.roomText}>
-                            {index === 0 ? `${roomName}` : ""}
+                            {index === 0 ? roomName : ""}
                         </div>
                     ))}
                 </div>
@@ -111,24 +178,36 @@ const ReservationForm = ({
                     />
                 </div>
 
-                {/* 넘버패드 조건부 렌더링 */}
                 {currentInput === "studentId" && (
-                    <NumberPad value={studentId} setValue={setStudentId} maxLength={10} />
+                    <NumberPad
+                        value={studentId}
+                        setValue={(v) => setStudentId(v.replace(/\D/g, "").slice(0, 10))}
+                        maxLength={10}
+                    />
                 )}
                 {currentInput === "phone" && (
-                    <NumberPad value={phone} setValue={setPhone} maxLength={11} />
+                    <NumberPad
+                        value={phone}
+                        setValue={(v) => setPhone(v.replace(/\D/g, "").slice(0, 11))}
+                        maxLength={11}
+                    />
                 )}
                 {currentInput === "password" && (
-                    <NumberPad value={password} setValue={(v) => setPassword(v.slice(0, 4))} />
+                    <NumberPad
+                        value={password}
+                        setValue={(v) => setPassword(v.replace(/\D/g, "").slice(0, 4))}
+                    />
                 )}
 
-                <p className={styles.errorText}>
-                    {showError ? "모든 정보를 입력해주세요." : "\u00A0"}
-                </p>
+                <p className={styles.errorText}>{showError ?? "\u00A0"}</p>
 
                 <div className={styles.buttonSection}>
-                    <button className={styles.submitBtn} onClick={handleSubmit}>
-                        예약하기
+                    <button
+                        className={styles.submitBtn}
+                        onClick={handleSubmit}
+                        disabled={submitting}
+                    >
+                        {submitting ? "처리 중..." : "예약하기"}
                     </button>
                 </div>
             </div>

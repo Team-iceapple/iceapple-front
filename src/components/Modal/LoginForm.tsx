@@ -2,26 +2,51 @@ import { useState } from "react";
 import styles from "./Modal.module.css";
 import logo from "/logo.svg";
 import NumberPad from "../NumberPad/NumberPad.tsx";
+import axios from "axios";
+
+type Step = "login" | "loginError" | "reservationList";
+
+interface LoginFormProps {
+    step: Step;
+    setStep: (s: Step) => void;
+    studentId: string;
+    setStudentId: (id: string) => void;
+    setLoginPassword: (p: string) => void;
+}
+
+const API_BASE_URL = `${import.meta.env.VITE_API_BASE_URL}place/api`;
 
 const LoginForm = ({
                        step,
                        setStep,
                        studentId,
                        setStudentId,
-                   }: {
-    step: "login" | "loginError";
-    setStep: (s: "login" | "loginError" | "reservationList") => void;
-    studentId: string;
-    setStudentId: (id: string) => void;
-}) => {
+                       setLoginPassword,
+                   }: LoginFormProps) => {
     const [password, setPassword] = useState("");
-    const [currentInput, setCurrentInput] = useState<"studentId" | "password" | null>(null); // ✅ 이 위치로 이동
+    const [currentInput, setCurrentInput] =
+        useState<"studentId" | "password" | null>(null);
+    const [loading, setLoading] = useState(false);
 
-    const handleSubmit = () => {
-        if (studentId === "20221037" && password === "0000") {
-            setStep("reservationList");
-        } else {
+    const handleSubmit = async () => {
+        if (!studentId || password.length !== 4) {
             setStep("loginError");
+            return;
+        }
+        setLoading(true);
+        try {
+            await axios.post(`${API_BASE_URL}/reservations/reservation-info`, {
+                student_number: studentId,
+                password,
+            });
+
+            setLoginPassword(password);
+            setStep("reservationList");
+        } catch (e) {
+            console.error(e);
+            setStep("loginError");
+        } finally {
+            setLoading(false);
         }
     };
 
@@ -53,7 +78,10 @@ const LoginForm = ({
                 <NumberPad value={studentId} setValue={setStudentId} maxLength={10} />
             )}
             {currentInput === "password" && (
-                <NumberPad value={password} setValue={(v) => setPassword(v.slice(0, 4))} />
+                <NumberPad
+                    value={password}
+                    setValue={(v) => setPassword(v.slice(0, 4))}
+                />
             )}
 
             <p className={styles.errorText}>
@@ -61,8 +89,12 @@ const LoginForm = ({
             </p>
 
             <div className={styles.buttonSection}>
-                <button className={styles.submitBtn} onClick={handleSubmit}>
-                    예약 내역 조회/취소
+                <button
+                    className={styles.submitBtn}
+                    onClick={handleSubmit}
+                    disabled={loading}
+                >
+                    {loading ? "확인 중..." : "예약 내역 조회/취소"}
                 </button>
             </div>
         </>
