@@ -7,6 +7,7 @@ import ProjectDetail from "./pages/Project/ProjectDetail.tsx";
 import Notice from "./pages/Notice/Notice.tsx";
 import Room from "./pages/Room/Room.tsx";
 import RoomReservation from "./pages/Room/RoomReservation.tsx";
+import Sojoong from "./pages/Sojoong/Sojoong.tsx"
 
 
 const App: React.FC = () => {
@@ -17,6 +18,8 @@ const App: React.FC = () => {
                     <Route path="/" element={<Home />} />
                     <Route path="/notice" element={<Notice />} />
                     <Route path="/notice/:id" element={<Notice />} />
+                    <Route path="/sojoong" element={<Sojoong />} />
+                    <Route path="/sojoong:id" element={<Sojoong />} />
                     <Route path="/works" element={<Project />} />
                     <Route path="/works/:workid" element={<ProjectDetail />} />
                     <Route path="/rooms" element={<Room />} />
