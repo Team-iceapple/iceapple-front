@@ -7,10 +7,7 @@
     align-items: center;
     width: 16vw;
     height: 83vh;
-    /*max-height: 900px;*/
     padding: 0 10px;
-
-
 }
 
 .logo {
@@ -63,33 +60,28 @@
     background-color: rgba(66, 153, 181, 0.33);
 }
 
-/* ==== Kiosk bottom sheet ==== */
-
-/* 터치 환경: 텍스트 선택/롱프레스 방지 */
 .sidebar, .nav, .kioskBtn, .kioskCancel {
     -webkit-user-select: none;
     user-select: none;
     -webkit-touch-callout: none;
 }
 
-/* 배경 */
 .sheetBackdrop {
     position: fixed;
     inset: 0;
     background: rgba(0,0,0,0);
     display: grid;
     place-items: end center;
-    z-index: 999; /* UI 최상단 */
+    z-index: 999;
     transition: background .18s ease-out;
 }
 .sheetBackdrop.show {
     background: rgba(0,0,0,0.35);
 }
 
-/* 시트 */
 .sheet {
     width: 100%;
-    max-width: 560px;          /* 큰 패널도 OK */
+    max-width: 560px;
     background: #ffffff;
     border-radius: 20px 20px 0 0;
     box-shadow: 0 -8px 24px rgba(0,0,0,0.2);
@@ -116,7 +108,6 @@
     margin: 4px 0 16px;
 }
 
-/* 버튼들은 손가락 기준 48px+ 높이 & 넓은 터치 타겟 */
 .sheetButtons {
     display: grid;
     gap: 16px;
@@ -145,7 +136,6 @@
     margin-top: 4px;
 }
 
-/* 취소 버튼도 큼직하게 */
 .kioskCancel {
     width: 100%;
     padding: 16px;
@@ -159,8 +149,79 @@
     transform: scale(0.99);
 }
 
-/* 작은 화면에서도 충분한 터치 여백 */
-@media (max-width: 420px) {
-    .kioskBtn { font-size: 18px; padding: 16px 14px; }
-    .sheetTitle { font-size: 20px; }
+.group {
+    display: flex;
+    flex-direction: column;
+}
+
+.activeSoft {
+    background-color: rgba(66, 153, 181, 0.33);
+    color: #000000;
+}
+
+.caret {
+    margin-left: auto;
+    width: 1.2vw;
+    height: 1.2vw;
+    opacity: 0.7;
+    transition: transform 0.18s ease;
+    display: inline-block;
+}
+.caretOpen {
+    transform: rotate(180deg);
+}
+
+.submenuWrap {
+    overflow: hidden;
+    max-height: 0;
+    transition: max-height 0.18s ease;
+    margin-left: 0.6vw;
+    border-radius: 0 0 9px 9px;
+}
+.submenuOpen {
+    max-height: 15vh;
+}
+
+.sublink {
+    display: flex;
+    align-items: center;
+    gap: 0.5vw;
+    padding: 0.8vw 0.8vw 0.8vw 0.6vw;
+    margin: 0.3vw 0;
+    border-radius: 8px;
+    font-size: 1.2vw;
+    font-weight: 600;
+    color: #2a2f35;
+    text-decoration: none;
+}
+
+.subActive {
+    background-color: rgba(66, 153, 181, 0.33);
+}
+
+.bullet {
+    width: 0.5vw;
+    height: 0.5vw;
+    min-width: 6px;
+    min-height: 6px;
+    border-radius: 999px;
+    background: #9ecae1;
+    flex: 0 0 auto;
+}
+
+.subRight {
+    margin-left: auto;
+    font-size: 0.9vw;
+    opacity: 0.6;
+}
+
+.link,
+.link:focus,
+.link:active,
+.sublink,
+.sublink:focus,
+.sublink:active {
+    outline: none;
+    border: none;
+    box-shadow: none;
 }

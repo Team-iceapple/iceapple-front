@@ -1,37 +1,53 @@
-import { useState, useEffect, useCallback, useRef } from 'react';
-import { NavLink, useNavigate } from 'react-router-dom';
+import { useCallback, useEffect, useRef, useState } from 'react';
+import { NavLink, useNavigate, useLocation } from 'react-router-dom';
 import { Icon } from '@iconify/react';
 import logo from '/logo.svg';
 import styles from './Sidebar.module.css';
 
 const Sidebar = () => {
-    const [openSheet, setOpenSheet] = useState(false);
-    const [anim, setAnim] = useState(false);
     const navigate = useNavigate();
-    const sheetRef = useRef(null);
+    const location = useLocation();
+    const [openNotice, setOpenNotice] = useState(false);
+    const groupRef = useRef(null);
 
-    const openModal = useCallback((e) => {
-        e.preventDefault();
-        setOpenSheet(true);
-        requestAnimationFrame(() => setAnim(true));
+    useEffect(() => {
+        const onClickOutside = (e) => {
+            if (!groupRef.current) return;
+            if (!groupRef.current.contains(e.target)) {
+                setOpenNotice(false);
+            }
+        };
+        const onKey = (e) => {
+            if (e.key === 'Escape') setOpenNotice(false);
+        };
+        document.addEventListener('click', onClickOutside);
+        document.addEventListener('keydown', onKey);
+        return () => {
+            document.removeEventListener('click', onClickOutside);
+            document.removeEventListener('keydown', onKey);
+        };
     }, []);
 
-    const closeModal = useCallback(() => {
-        setAnim(false);
-        setTimeout(() => setOpenSheet(false), 180);
-    }, []);
+    useEffect(() => {
+        const isNoticePath =
+            location.pathname.startsWith('/notice') ||
+            location.pathname.startsWith('/sojoong');
+        setOpenNotice(isNoticePath);
+    }, [location.pathname]);
 
-    const safeNav = (path) => {
-        if (!path) return;
-        closeModal();
-        navigate(path, { replace: false });
-    };
+    const safeNav = useCallback(
+        (path) => {
+            if (!path) return;
+            navigate(path, { replace: false });
+        },
+        [navigate]
+    );
 
     return (
         <aside className={styles.sidebar}>
             <img src={logo} alt="로고" className={styles.logo} />
             <h2 className={styles.title}>모바일융합공학과</h2>
-            <div className={styles.divider}></div>
+            <div className={styles.divider} />
 
             <nav className={styles.nav}>
                 <NavLink
@@ -44,16 +60,69 @@ const Sidebar = () => {
                     홈
                 </NavLink>
 
-                <NavLink
-                    to="/notice"
-                    onClick={openModal}
-                    className={({ isActive }) =>
-                        `${styles.link} ${isActive ? styles.active : ''}`
-                    }
-                >
-                    <Icon icon="lucide:megaphone" className={styles.icon} />
-                    공지사항
-                </NavLink>
+                <div className={styles.group} ref={groupRef}>
+                    <button
+                        type="button"
+                        className={`${styles.link} ${
+                            location.pathname.startsWith('/notice') ||
+                            location.pathname.startsWith('/sojoong')
+                                ? styles.activeSoft
+                                : ''
+                        }`}
+                        aria-expanded={openNotice}
+                        aria-controls="notice-submenu"
+                        onClick={(e) => {
+                            e.stopPropagation();
+                            setOpenNotice((v) => !v);
+                        }}
+                    >
+                        <Icon icon="lucide:megaphone" className={styles.icon} />
+                        공지사항
+                        <Icon
+                            icon="lucide:chevron-down"
+                            className={`${styles.caret} ${openNotice ? styles.caretOpen : ''}`}
+                        />
+                    </button>
+
+                    <div
+                        id="notice-submenu"
+                        role="menu"
+                        aria-label="공지사항 하위 메뉴"
+                        className={`${styles.submenuWrap} ${
+                            openNotice ? styles.submenuOpen : ''
+                        }`}
+                    >
+                        <NavLink
+                            to="/notice"
+                            role="menuitem"
+                            className={({ isActive }) =>
+                                `${styles.sublink} ${isActive ? styles.subActive : ''}`
+                            }
+                            onClick={(e) => {
+                                e.preventDefault();
+                                safeNav('/notice');
+                            }}
+                        >
+                            <span className={styles.bullet} />
+                            모바일융합공학과
+                        </NavLink>
+
+                        <NavLink
+                            to="/sojoong"
+                            role="menuitem"
+                            className={({ isActive }) =>
+                                `${styles.sublink} ${isActive ? styles.subActive : ''}`
+                            }
+                            onClick={(e) => {
+                                e.preventDefault();
+                                safeNav('/sojoong');
+                            }}
+                        >
+                            <span className={styles.bullet} />
+                            소프트웨어중심사업단
+                        </NavLink>
+                    </div>
+                </div>
 
                 <NavLink
                     to="/rooms"
@@ -75,54 +144,6 @@ const Sidebar = () => {
                     프로젝트
                 </NavLink>
             </nav>
-
-            {openSheet && (
-                <div
-                    className={`${styles.sheetBackdrop} ${anim ? styles.show : ''}`}
-                    onClick={closeModal}
-                    role="presentation"
-                >
-                    <div
-                        ref={sheetRef}
-                        className={`${styles.sheet} ${anim ? styles.slideUp : ''}`}
-                        onClick={(e) => e.stopPropagation()}
-                        role="dialog"
-                        aria-modal="true"
-                        aria-labelledby="noticeSheetTitle"
-                    >
-                        <div className={styles.sheetHandle} aria-hidden="true" />
-                        <h3 id="noticeSheetTitle" className={styles.sheetTitle}>
-                            공지사항 선택
-                        </h3>
-
-                        <div className={styles.sheetButtons}>
-                            <button
-                                type="button"
-                                className={styles.kioskBtn}
-                                onClick={() => safeNav('/notice')}
-                            >
-                                학과 공지사항<br /><span className={styles.sub}>Notice</span>
-                            </button>
-
-                            <button
-                                type="button"
-                                className={styles.kioskBtn}
-                                onClick={() => safeNav('/sojoong')}
-                            >
-                                소프트웨어중심사업단<br /><span className={styles.sub}>sojoong</span>
-                            </button>
-                        </div>
-
-                        <button
-                            type="button"
-                            className={styles.kioskCancel}
-                            onClick={closeModal}
-                        >
-                            닫기
-                        </button>
-                    </div>
-                </div>
-            )}
         </aside>
     );
 };
