@@ -1,3 +1,7 @@
+.container {
+    padding: 1.8vw 2vw 2vw 5.5vw;
+}
+
 .detailLayout {
     display: flex;
     gap: 2vw;

@@ -21,7 +21,6 @@
     overflow-y: auto;
 }
 
-
 .createdAt {
     font-size: 0.8333vw;
 }
@@ -54,5 +53,5 @@
 .qr-container p {
     font-size: 0.95rem;
     margin-bottom: 1rem;
-    color: #fff8f8;;
+    color: #fff8f8;
 }

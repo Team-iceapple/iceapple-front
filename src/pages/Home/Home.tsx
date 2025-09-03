@@ -1,74 +1,70 @@
 import { useEffect, useRef, useState } from "react";
 import styles from "./Home.module.css";
 
-const API_BASE_URL = `${import.meta.env.VITE_API_BASE_URL}home/videos`;
+const API_BASE = import.meta.env.VITE_API_BASE_URL;
+const API = new URL(API_BASE);
+const ORIGIN = API.origin;
+const BASE_PATH = API.pathname.replace(/\/$/, "");
+const VIDEOS_API = `${ORIGIN}${BASE_PATH}/home/videos`;
+
+function buildMediaUrl(fileUrl: string) {
+    if (!fileUrl) return "";
+    if (/^https?:\/\//i.test(fileUrl)) return fileUrl;
+
+    const cleaned = fileUrl.replace(/^\.?\//, "");
+    if (cleaned.startsWith("media/")) {
+        return `${ORIGIN}${BASE_PATH}/home/${cleaned}`;
+    }
+
+    if (fileUrl.startsWith("/")) {
+        return `${ORIGIN}${BASE_PATH}${fileUrl}`;
+    }
+    return `${ORIGIN}${BASE_PATH}/${cleaned}`.replace(/([^:]\/)\/+/g, "$1");
+}
 
 const Home = () => {
-    const [videoUrl, setVideoUrl] = useState<string>("");
+    const [videoUrl, setVideoUrl] = useState("");
     const [autoplayFailed, setAutoplayFailed] = useState(false);
     const videoRef = useRef<HTMLVideoElement | null>(null);
 
     useEffect(() => {
         let abort = false;
-        fetch(`${API_BASE_URL}/current`)
-            .then((res) => res.json())
+        fetch(`${VIDEOS_API}/current`)
+            .then(async (res) => {
+                if (!res.ok) {
+                    const txt = await res.text().catch(() => "");
+                    throw new Error(`[${res.status}] ${res.statusText} ${txt}`);
+                }
+                return res.json();
+            })
             .then((data) => {
                 if (abort) return;
-                // data.url은 절대/상대경로 모두 가능하다고 가정
-                setVideoUrl(data?.url ?? "");
+                const raw = data?.fileUrl;
+                const abs = buildMediaUrl(raw);
+                setVideoUrl(abs);
             })
-            .catch((err) => {
-                console.error("비디오 로드 실패:", err);
-            });
-        return () => {
-            abort = true;
-        };
+            .catch((err) => console.error("비디오 로드 실패:", err));
+        return () => { abort = true; };
     }, []);
 
     useEffect(() => {
         const v = videoRef.current;
         if (!v || !videoUrl) return;
-
-        v.muted = true;
-        v.setAttribute("playsinline", "true"); // iOS 사파리
-        v.playsInline = true;
-        v.autoplay = true;
+        v.muted = true; v.playsInline = true; v.autoplay = true;
 
         const tryPlay = async () => {
-            try {
-                const p = v.play();
-                if (p && typeof p.then === "function") {
-                    await p;
-                }
-                setAutoplayFailed(false);
-            } catch (_e) {
+            try { await v.play(); setAutoplayFailed(false); }
+            catch {
                 const onMeta = async () => {
                     v.removeEventListener("loadedmetadata", onMeta);
-                    try {
-                        await v.play();
-                        setAutoplayFailed(false);
-                    } catch (e2) {
-                        console.warn("자동재생 실패(사용자 제스처 필요):", e2);
-                        setAutoplayFailed(true);
-                    }
+                    try { await v.play(); setAutoplayFailed(false); }
+                    catch { setAutoplayFailed(true); }
                 };
                 v.addEventListener("loadedmetadata", onMeta);
             }
         };
-
         tryPlay();
     }, [videoUrl]);
-
-    const handleManualPlay = async () => {
-        const v = videoRef.current;
-        if (!v) return;
-        try {
-            await v.play();
-            setAutoplayFailed(false);
-        } catch (e) {
-            console.error("수동 재생도 실패:", e);
-        }
-    };
 
     return (
         <div className={styles.container}>
@@ -78,18 +74,16 @@ const Home = () => {
                         <video
                             ref={videoRef}
                             src={videoUrl}
-                            autoPlay
-                            muted
-                            loop
-                            playsInline
-                            preload="auto"
+                            autoPlay muted loop playsInline preload="auto"
                             className={styles.video}
-                            onLoadedMetadata={() => {
-                                videoRef.current?.play().catch(() => setAutoplayFailed(true));
-                            }}
+                            onLoadedMetadata={() =>
+                                videoRef.current?.play().catch(() => setAutoplayFailed(true))
+                            }
+                            onError={() => console.error("video 태그 에러:", videoUrl)}
                         />
                         {autoplayFailed && (
-                            <button className={styles.playOverlay} onClick={handleManualPlay}>
+                            <button className={styles.playOverlay}
+                                    onClick={() => videoRef.current?.play()}>
                                 재생하기
                             </button>
                         )}

@@ -1,5 +1,5 @@
 .notice-container {
-    padding: 2.5vw 3vw;
+    padding: 5.5vw 2vw 2vw 3vw;
     font-family: "pretendard", sans-serif;
 }
 
@@ -23,13 +23,13 @@
 }
 
 .notice-content {
-    background-color: rgba(228, 217, 199, 0.51);
+    background-color: #fbeee7;
     display: flex;
     flex-direction: row;
     align-items: center;
     width: 60.4167vw;
     height: 3.5417vw;
-    margin-left: 9.2361vw;
+    margin-left: 7vw;
     margin-top: 1.0vw;
     padding: 0 1vw;
     border-radius: 1.3889vw;
@@ -50,6 +50,7 @@
 }
 
 .notice-content-title {
+    margin-top: 0.7vw;
     flex-grow: 1;
     font-size: 1.2vw;
     white-space: nowrap;

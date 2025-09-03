@@ -15,7 +15,8 @@ type NoticeDetailDto = {
     has_attachment: boolean;
 };
 
-const API_URL = `${import.meta.env.VITE_API_BASE_URL}notice/api/sojoong`;
+const API_BASE = import.meta.env.VITE_API_BASE_URL;
+const API_URL = `${API_BASE}notice/api/sojoong`;
 
 const SojoongDetail = ({ id, onClose }: Props) => {
     const [notice, setNotice] = useState<NoticeDetailDto | null>(null);
@@ -88,12 +89,10 @@ const SojoongDetail = ({ id, onClose }: Props) => {
                     />
                 )}
             </div>
+
             <div className={styles["qr-container"]}>
-                <p> &nbsp; 모바일에서 확인하려면 QR을 스캔하세요</p>
-                <QRCode
-                    value={`${window.location.origin}/sojoong/${notice.id}`}
-                    size={128}
-                />
+                <p>&nbsp; 모바일에서 확인하려면 QR을 스캔하세요</p>
+                <QRCode value={`${API_URL}/${notice.id}`} size={128} />
             </div>
         </div>
     );

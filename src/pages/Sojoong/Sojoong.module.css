@@ -1,5 +1,5 @@
 .sojoongContainer {
-    padding: 2.5vw 3vw;
+    padding: 5.5vw 2vw 2vw 3vw;
     font-family: "pretendard", sans-serif;
 }
 
@@ -22,13 +22,13 @@
 }
 
 .sojoongContent {
-    background-color: rgba(228, 217, 199, 0.51);
+    background-color: #fbeee7;
     display: flex;
     flex-direction: row;
     align-items: center;
     width: 60.4167vw;
     height: 3.5417vw;
-    margin-left: 9.2361vw;
+    margin-left: 7vw;
     margin-top: 1.0vw;
     padding: 0 1vw;
     border-radius: 1.3889vw;
@@ -49,6 +49,7 @@
 }
 
 .sojoongContentTitle {
+    margin-top: 0.7vw;
     flex-grow: 1;
     font-size: 1.2vw;
     white-space: nowrap;
@@ -63,92 +64,4 @@
 
 .sojoongSlideGroup {
     margin-bottom: 5vw;
-}
-
-.sojoongSwiper {
-    padding-bottom: 2vw;
-    overflow: visible;
-}
-
-/* 스코프 프리픽스로 구체성 상승 */
-:global([data-scope="sojoong-page"]) .sojoongContainer {
-    padding: 2.5vw 3vw;
-    font-family: "pretendard", sans-serif;
-}
-
-:global([data-scope="sojoong-page"]) .sojoongHeader {
-    display: flex;
-    align-items: center;
-    gap: 1vw;
-    margin-bottom: 2vw;
-}
-
-:global([data-scope="sojoong-page"]) .sojoongHeaderIcon {
-    font-size: 3.5vw;
-    color: #424242;
-}
-
-:global([data-scope="sojoong-page"]) .sojoongHeaderTitle {
-    color: #424242;
-    font-size: 2.5vw;
-    font-weight: 700;
-}
-
-:global([data-scope="sojoong-page"]) .sojoongContent {
-    background-color: rgba(228, 217, 199, 0.51);
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    width: 60.4167vw;
-    height: 3.5417vw;
-    margin-left: 9.2361vw;
-    margin-top: 1vw;
-    padding: 0 1vw;
-    border-radius: 1.3889vw;
-
-    /* 레이어 겹침 방지용 안전장치 */
-    position: relative;
-    z-index: 1;
-}
-
-:global([data-scope="sojoong-page"]) .sojoongContentId {
-    font-weight: bold;
-    margin-right: 1vw;
-    width: 3vw;
-    text-align: center;
-}
-
-:global([data-scope="sojoong-page"]) .sojoongPinIcon {
-    width: 1.2153vw;
-    height: 1.2153vw;
-    margin-right: 1.9vw;
-    margin-left: 0.8vw;
-}
-
-:global([data-scope="sojoong-page"]) .sojoongContentTitle {
-    flex-grow: 1;
-    font-size: 1.2vw;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-}
-
-:global([data-scope="sojoong-page"]) .sojoongContentCreatedAt {
-    min-width: 6vw;
-    text-align: right;
-}
-
-:global([data-scope="sojoong-page"]) .sojoongSlideGroup {
-    margin-bottom: 5vw;
-}
-
-/* 스와이퍼가 자식의 그림자/라운드 자르는 문제 방지 */
-:global([data-scope="sojoong-page"]) .sojoongSwiper {
-    padding-bottom: 2vw;
-    overflow: visible;
-}
-
-/* 라이브러리 기본값이 잘라먹는 경우 대비 */
-:global(.swiper-slide) {
-    overflow: visible;
 }

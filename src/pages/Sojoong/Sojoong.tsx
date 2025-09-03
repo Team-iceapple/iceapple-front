@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import styles from "./Sojoong.module.css";
-import SojoongDetail from "./SojoongDetail.tsx";
+import SojoongDetail from "./SojoongDetail";
 import NoticePinIcon from "../../../assets/notice-content-pin-icon.svg";
 
 import { Swiper, SwiperSlide } from "swiper/react";
@@ -21,7 +21,8 @@ export type NoticeItem = {
     postNumber?: number;
 };
 
-const API_URL = `${import.meta.env.VITE_API_BASE_URL}notice/api/sojoong`;
+const API_BASE = import.meta.env.VITE_API_BASE_URL; // e.g. https://task-api.wisoft.io/iceapple/
+const API_URL = `${API_BASE}notice/api/sojoong`;
 
 const chunk = <T,>(arr: T[], size: number): T[][] =>
     Array.from({ length: Math.ceil(arr.length / size) }, (_, i) =>
@@ -34,22 +35,18 @@ const Sojoong = () => {
     const [notices, setNotices] = useState<NoticeItem[]>([]);
 
     useEffect(() => {
-        console.log("📡 Sojoong 목록 요청 URL:", API_URL);
-
         fetch(API_URL)
             .then((res) => {
                 if (!res.ok) throw new Error(`HTTP ${res.status}`);
                 return res.json();
             })
             .then((data) => {
-                console.log("📦 Sojoong 응답 데이터:", data);
                 const list: NoticeItem[] =
                     Array.isArray(data) ? data :
                         Array.isArray(data?.notices) ? data.notices :
                             Array.isArray(data?.items) ? data.items :
                                 [];
-                setNotices(data.notices);
-                console.log(data.notices);
+                setNotices(list);
             })
             .catch((err) => {
                 console.error("❌ 공지사항 로딩 실패:", err);
@@ -57,8 +54,8 @@ const Sojoong = () => {
             });
     }, []);
 
-    const handleClick = (noticeId: string | number) => {
-        navigate(`/sojoong/${noticeId}`);
+    const handleClick = (nid: string | number) => {
+        navigate(`/sojoong/${nid}`);
     };
 
     const closeModal = () => {
@@ -69,12 +66,11 @@ const Sojoong = () => {
 
     const pinned = notices.filter((n) => n.is_pin).slice(0, 3);
     const unpinned = notices.filter((n) => !n.is_pin);
-
     const sorted = [...pinned, ...unpinned];
 
     const numberedNotices = sorted.map((notice, index) => ({
         ...notice,
-        postNumber: sorted.length - index + 631,
+        postNumber: sorted.length - index, // 최신이 큰 번호
     }));
 
     const numberedChunks = chunk(numberedNotices, 6);
@@ -92,10 +88,10 @@ const Sojoong = () => {
                 modules={[Pagination]}
                 className={styles.sojoongSwiper}
             >
-                {numberedChunks.map((chunk, index) => (
+                {numberedChunks.map((group, index) => (
                     <SwiperSlide key={index}>
                         <div className={styles.sojoongSlideGroup}>
-                            {chunk.map((notice) => (
+                            {group.map((notice) => (
                                 <div
                                     key={notice.id}
                                     className={styles.sojoongContent}
@@ -134,7 +130,6 @@ const Sojoong = () => {
             )}
         </div>
     );
-
 };
 
 export default Sojoong;
