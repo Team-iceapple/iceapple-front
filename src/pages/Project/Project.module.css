@@ -1,5 +1,5 @@
 .container {
-    padding: 1.5vw 3vw;
+    padding: 3vw 4vw;
     position: relative;
 }
 
@@ -34,7 +34,6 @@
     font-weight: 600;
     cursor: pointer;
     margin-left: auto;
-    margin-top: auto;
 }
 
 .yearDropdownToggle {

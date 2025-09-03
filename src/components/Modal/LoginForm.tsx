@@ -58,14 +58,14 @@ const LoginForm = ({
 
             <div className={styles.inputGroup}>
                 <input
-                    className={styles.input}
+                    className={`${styles.input} ${currentInput === "studentId" ? styles.inputActive : ""}`}
                     placeholder="학번"
                     value={studentId}
                     onFocus={() => setCurrentInput("studentId")}
                     readOnly
                 />
                 <input
-                    className={styles.input}
+                    className={`${styles.input} ${currentInput === "password" ? styles.inputActive : ""}`}
                     placeholder="간편 비밀번호 4자리"
                     type="password"
                     value={password}
@@ -75,13 +75,17 @@ const LoginForm = ({
             </div>
 
             {currentInput === "studentId" && (
-                <NumberPad value={studentId} setValue={setStudentId} maxLength={10} />
+                <div className={styles.numpadWrap}>
+                    <NumberPad value={studentId} setValue={setStudentId} maxLength={10} />
+                </div>
             )}
             {currentInput === "password" && (
-                <NumberPad
-                    value={password}
-                    setValue={(v) => setPassword(v.slice(0, 4))}
-                />
+                <div className={styles.numpadWrap}>
+                    <NumberPad
+                        value={password}
+                        setValue={(v) => setPassword(v.slice(0, 4))}
+                    />
+                </div>
             )}
 
             <p className={styles.errorText}>

@@ -36,7 +36,8 @@ const ReservationForm = ({ date, selectedTimes, roomName, roomId }: Props) => {
     const [studentId, setStudentId] = useState("");
     const [phone, setPhone] = useState("");
     const [password, setPassword] = useState("");
-    const [currentInput, setCurrentInput] = useState<"studentId" | "phone" | "password" | null>(null);
+    const [currentInput, setCurrentInput] =
+        useState<"studentId" | "phone" | "password" | null>(null);
 
     const [submitting, setSubmitting] = useState(false);
     const [showError, setShowError] = useState<string | null>(null);
@@ -70,7 +71,9 @@ const ReservationForm = ({ date, selectedTimes, roomName, roomId }: Props) => {
             return;
         }
 
-        const times = Array.from(new Set(selectedTimes.map(timeToHour))).sort((a, b) => a - b);
+        const times = Array.from(new Set(selectedTimes.map(timeToHour))).sort(
+            (a, b) => a - b
+        );
 
         const payload = {
             student_number: studentId,
@@ -85,12 +88,8 @@ const ReservationForm = ({ date, selectedTimes, roomName, roomId }: Props) => {
         setSubmitting(true);
         try {
             await axios.post(`${API_BASE_URL}/reservations`, payload, {
-                headers: {
-                    "Content-Type": "application/json",
-                    Accept: "application/json",
-                },
+                headers: { "Content-Type": "application/json", Accept: "application/json" },
             });
-
             setIsConfirmed(true);
         } catch (err) {
             const axiosErr = err as AxiosError<{ message?: string }>;
@@ -153,23 +152,30 @@ const ReservationForm = ({ date, selectedTimes, roomName, roomId }: Props) => {
             </div>
 
             <div style={{ width: "100%" }}>
+                {/* ▼ 숫자패드 기준점 */}
                 <div className={styles.inputGroup}>
                     <input
-                        className={styles.input}
-                        placeholder="학번"
+                        className={`${styles.input} ${
+                            currentInput === "studentId" ? styles.inputActive : ""
+                        }`}
+                        placeholder="학번 (8자리)"
                         value={studentId}
                         readOnly
                         onFocus={() => setCurrentInput("studentId")}
                     />
                     <input
-                        className={styles.input}
-                        placeholder="전화번호"
+                        className={`${styles.input} ${
+                            currentInput === "phone" ? styles.inputActive : ""
+                        }`}
+                        placeholder="전화번호 (하이픈 없이 11자리)"
                         value={phone}
                         readOnly
                         onFocus={() => setCurrentInput("phone")}
                     />
                     <input
-                        className={styles.input}
+                        className={`${styles.input} ${
+                            currentInput === "password" ? styles.inputActive : ""
+                        }`}
                         placeholder="간편비밀번호 4자리"
                         type="password"
                         value={password}
@@ -179,24 +185,31 @@ const ReservationForm = ({ date, selectedTimes, roomName, roomId }: Props) => {
                 </div>
 
                 {currentInput === "studentId" && (
-                    <NumberPad
-                        value={studentId}
-                        setValue={(v) => setStudentId(v.replace(/\D/g, "").slice(0, 10))}
-                        maxLength={10}
-                    />
+                    <div className={styles.numpadWrap}>
+                        <NumberPad
+                            value={studentId}
+                            setValue={(v) => setStudentId(v.replace(/\D/g, "").slice(0, 8))}
+                            maxLength={8}
+                        />
+                    </div>
                 )}
                 {currentInput === "phone" && (
-                    <NumberPad
-                        value={phone}
-                        setValue={(v) => setPhone(v.replace(/\D/g, "").slice(0, 11))}
-                        maxLength={11}
-                    />
+                    <div className={styles.numpadWrap}>
+                        <NumberPad
+                            value={phone}
+                            setValue={(v) => setPhone(v.replace(/\D/g, "").slice(0, 11))}
+                            maxLength={11}
+                        />
+                    </div>
                 )}
                 {currentInput === "password" && (
-                    <NumberPad
-                        value={password}
-                        setValue={(v) => setPassword(v.replace(/\D/g, "").slice(0, 4))}
-                    />
+                    <div className={styles.numpadWrap}>
+                        <NumberPad
+                            value={password}
+                            setValue={(v) => setPassword(v.replace(/\D/g, "").slice(0, 4))}
+                            maxLength={4}
+                        />
+                    </div>
                 )}
 
                 <p className={styles.errorText}>{showError ?? "\u00A0"}</p>

@@ -35,6 +35,12 @@ const RoomReservation = () => {
     const [error, setError] = useState<string | null>(null);
     const [modalOpen, setModalOpen] = useState(false);
 
+    const handleCloseModal = () => {
+        setModalOpen(false);
+        setSelectedTime([]);
+        setDate(new Date());
+    };
+
     const isCapstoneRoom = useMemo(() => roomId === "capstone", [roomId]);
 
     useEffect(() => {
@@ -201,7 +207,7 @@ const RoomReservation = () => {
 
             {modalOpen && (
                 <Modal
-                    onClose={() => setModalOpen(false)}
+                    onClose={handleCloseModal}
                     initialStep="reservation"
                     date={date}
                     selectedTimes={selectedTime}

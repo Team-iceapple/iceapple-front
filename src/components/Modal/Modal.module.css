@@ -17,8 +17,8 @@
     background: white;
     border-radius: 20px;
     padding: 2vw 2.6vw;
-    width: 19vw;
-    height: 22vw;
+    width: 22vw;
+    height: 25vw;
     position: relative;
     display: flex;
     flex-direction: column;
@@ -135,12 +135,21 @@
     background-color: #4399B5;
 }
 
+.numpadWrap {
+    position: absolute;
+    top: 20%;
+    left: 100%;
+    margin-left: 12px;
+    z-index: 1100;
+}
+
 /*입력창*/
 .inputGroup {
     display: flex;
     flex-direction: column;
     gap: 1vw;
     width: 100%;
+    position: relative;
 }
 
 .input {
@@ -152,6 +161,20 @@
     outline: none;
     box-sizing: border-box;
 }
+.input:focus {
+    border-color: #2e86a6;
+    box-shadow: 0 0 0 3px rgba(67, 153, 181, 0.25);
+    background-color: #f9fdff;
+}
+
+/* 선택된 입력창(강조용) */
+.inputActive {
+    border-color: #2e86a6;
+    box-shadow: 0 0 0 3px rgba(67, 153, 181, 0.25);
+    background-color: #f9fdff;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease;
+}
+
 
 /*버튼*/
 .buttonSection {
@@ -163,6 +186,7 @@
 }
 
 .submitBtn {
+    width: 100%;
     background-color: #4399B5;
     color: white;
     padding: 0.5vw 2vw;
