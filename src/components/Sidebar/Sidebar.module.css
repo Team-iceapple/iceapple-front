@@ -11,7 +11,7 @@
 }
 
 .logo {
-    width: 6vw;
+    width: 5.059vw;
     height: 6vw;
     margin: 2vw 0;
 }
@@ -155,7 +155,7 @@
 }
 
 .activeSoft {
-    background-color: rgba(66, 153, 181, 0.33);
+    background-color: rgb(255, 255, 255);
     color: #000000;
 }
 
@@ -224,4 +224,10 @@
     outline: none;
     border: none;
     box-shadow: none;
+}
+
+.bigIcon {
+    width: 1.8vw;
+    height: 2.2vw;
+    margin: 0 0.2vw;
 }

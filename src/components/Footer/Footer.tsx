@@ -87,7 +87,7 @@ export const Footer = () => {
                         {now.format("YYYY년 M월 D일 dddd")}
                     </div>
                     <div className={styles["footer-time"]}>
-                        {now.format("A hh:mm:ss")}
+                        {now.format("A HH:mm:ss")}
                     </div>
                 </div>
                 <div className={styles["weather"]}>

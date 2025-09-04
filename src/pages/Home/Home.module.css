@@ -11,8 +11,8 @@
 }
 
 .videoWrapper {
-    width: 2000px;
-    height: 1130px;
+    width: 1500px;
+    height: 830px;
     aspect-ratio: 16 / 9;
     border: 2px solid #ccc;
     border-radius: 12px;

@@ -35,6 +35,9 @@ const RoomReservation = () => {
     const [error, setError] = useState<string | null>(null);
     const [modalOpen, setModalOpen] = useState(false);
 
+    const startOfToday = new Date();
+    startOfToday.setHours(0, 0, 0, 0);
+
     const handleCloseModal = () => {
         setModalOpen(false);
         setSelectedTime([]);
@@ -80,6 +83,7 @@ const RoomReservation = () => {
             } catch (e) {
                 setError("예약 현황을 불러오지 못했습니다.");
                 console.error(e);
+                console.error(e);
                 setAvailability(Array(10).fill(1));
             } finally {
                 setLoadingAvail(false);
@@ -93,7 +97,7 @@ const RoomReservation = () => {
             <div className={baseStyles.header}>
                 <div className={baseStyles.titleRow}>
                     <Icon icon="lucide:calendar" className={baseStyles.icon} />
-                    <h1 className={baseStyles.projectTitle}>공간 예약</h1>
+                    <h1 className={baseStyles.projectTitle}>회의실 예약</h1>
                 </div>
             </div>
 
@@ -116,22 +120,34 @@ const RoomReservation = () => {
                             ))
                         )}
                     </div>
-
                     <div className={reservationStyles.calendarWrapper}>
                         <Calendar
                             onChange={(value) => value instanceof Date && setDate(value)}
-                            value={date}
+                            value={date} // 선택된 날짜 상태
                             locale="ko-KR"
                             formatDay={(_, d) => d.getDate().toString()}
-                            calendarType="gregory"
+                            calendarType="iso8601"
                             prevLabel="<"
                             nextLabel=">"
                             prev2Label={null}
                             next2Label={null}
-                            navigationLabel={({ date, locale }) =>
-                                new Intl.DateTimeFormat(locale, { month: "long" }).format(date)
+                            minDate={startOfToday}
+                            tileDisabled={({ date, view }) =>
+                                view === "month" && (date.getDay() === 0 || date.getDay() === 6)
+                            }
+                            tileClassName={({ date: d, view }) => {
+                                if (view === "month" && d.toDateString() === new Date().toDateString()) {
+                                    return "today-tile"; // 오늘 날짜에만 파란 글씨
+                                }
+                                return null;
+                            }}
+                            tileContent={({ date: d, view }) =>
+                                view === "month" && d.toDateString() === new Date().toDateString() ? (
+                                    <div className="today-label">오늘</div>
+                                ) : null
                             }
                         />
+
                     </div>
                 </div>
 

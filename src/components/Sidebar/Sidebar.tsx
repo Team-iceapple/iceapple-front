@@ -119,7 +119,7 @@ const Sidebar = () => {
                             }}
                         >
                             <span className={styles.bullet} />
-                            소프트웨어중심사업단
+                            SW중심대학사업단
                         </NavLink>
                     </div>
                 </div>
@@ -140,8 +140,8 @@ const Sidebar = () => {
                         `${styles.link} ${isActive ? styles.active : ''}`
                     }
                 >
-                    <Icon icon="lucide:graduation-cap" className={styles.icon} />
-                    프로젝트
+                    <Icon icon="lucide:graduation-cap" className={`${styles.icon} ${styles.bigIcon}`} />
+                    졸업작품
                 </NavLink>
             </nav>
         </aside>

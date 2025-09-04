@@ -42,7 +42,7 @@ const Room = () => {
             <div className={baseStyles.header}>
                 <div className={baseStyles.titleRow}>
                     <Icon icon="lucide:calendar" className={baseStyles.icon} />
-                    <h1 className={baseStyles.projectTitle}>공간 예약</h1>
+                    <h1 className={baseStyles.projectTitle}>회의실 예약</h1>
                 </div>
             </div>
 
