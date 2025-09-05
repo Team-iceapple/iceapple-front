@@ -15,7 +15,6 @@ function buildMediaUrl(fileUrl: string) {
     if (cleaned.startsWith("media/")) {
         return `${ORIGIN}${BASE_PATH}/home/${cleaned}`;
     }
-
     if (fileUrl.startsWith("/")) {
         return `${ORIGIN}${BASE_PATH}${fileUrl}`;
     }
@@ -25,6 +24,10 @@ function buildMediaUrl(fileUrl: string) {
 const Home = () => {
     const [videoUrl, setVideoUrl] = useState("");
     const [autoplayFailed, setAutoplayFailed] = useState(false);
+    const [rate, setRate] = useState<number>(() => {
+        const saved = localStorage.getItem("home.videoRate");
+        return saved ? Number(saved) : 1.3; // 숫자 = 동영상 배속, 원하는대로 조정
+    });
     const videoRef = useRef<HTMLVideoElement | null>(null);
 
     useEffect(() => {
@@ -44,27 +47,49 @@ const Home = () => {
                 setVideoUrl(abs);
             })
             .catch((err) => console.error("비디오 로드 실패:", err));
-        return () => { abort = true; };
+        return () => {
+            abort = true;
+        };
     }, []);
 
     useEffect(() => {
         const v = videoRef.current;
+        if (!v) return;
+        v.playbackRate = rate;
+    }, [rate, videoUrl]);
+
+    useEffect(() => {
+        const v = videoRef.current;
         if (!v || !videoUrl) return;
-        v.muted = true; v.playsInline = true; v.autoplay = true;
+        v.muted = true;
+        v.playsInline = true;
+        v.autoplay = true;
 
         const tryPlay = async () => {
-            try { await v.play(); setAutoplayFailed(false); }
-            catch {
+            try {
+                await v.play();
+                setAutoplayFailed(false);
+            } catch {
                 const onMeta = async () => {
                     v.removeEventListener("loadedmetadata", onMeta);
-                    try { await v.play(); setAutoplayFailed(false); }
-                    catch { setAutoplayFailed(true); }
+                    try {
+                        await v.play();
+                        setAutoplayFailed(false);
+                    } catch {
+                        setAutoplayFailed(true);
+                    }
                 };
                 v.addEventListener("loadedmetadata", onMeta);
             }
         };
         tryPlay();
     }, [videoUrl]);
+
+    const setSpeed = (next: number) => {
+        setRate(next);
+        localStorage.setItem("home.videoRate", String(next));
+        if (videoRef.current) videoRef.current.playbackRate = next;
+    };
 
     return (
         <div className={styles.container}>
@@ -74,16 +99,51 @@ const Home = () => {
                         <video
                             ref={videoRef}
                             src={videoUrl}
-                            autoPlay muted loop playsInline preload="auto"
+                            autoPlay
+                            muted
+                            loop
+                            playsInline
+                            preload="auto"
                             className={styles.video}
                             onLoadedMetadata={() =>
                                 videoRef.current?.play().catch(() => setAutoplayFailed(true))
                             }
                             onError={() => console.error("video 태그 에러:", videoUrl)}
                         />
+
+                        <div className={styles.controls}>
+                            <label className={styles.rateLabel}>
+                                속도 {rate.toFixed(2)}x
+                            </label>
+                            <input
+                                type="range"
+                                min={0.25}
+                                max={2}
+                                step={0.05}
+                                value={rate}
+                                onChange={(e) => setSpeed(Number(e.target.value))}
+                                className={styles.rateSlider}
+                            />
+                            <div className={styles.rateButtons}>
+                                {[0.5, 1, 1.25, 1.5, 2].map((r) => (
+                                    <button
+                                        key={r}
+                                        onClick={() => setSpeed(r)}
+                                        className={`${styles.rateBtn} ${
+                                            Math.abs(rate - r) < 0.001 ? styles.active : ""
+                                        }`}
+                                    >
+                                        {r}x
+                                    </button>
+                                ))}
+                            </div>
+                        </div>
+
                         {autoplayFailed && (
-                            <button className={styles.playOverlay}
-                                    onClick={() => videoRef.current?.play()}>
+                            <button
+                                className={styles.playOverlay}
+                                onClick={() => videoRef.current?.play()}
+                            >
                                 재생하기
                             </button>
                         )}
