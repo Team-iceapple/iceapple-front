@@ -14,10 +14,10 @@ html, body, #root {
 
 /* 캘린더 전체 스타일 */
 .react-calendar {
-  font-family: "pretendard", sans-serif;
+  font-family: "pretendard", sans-serif !important;
   width: auto;
   border: none !important;
-  transform: scale(1.3);
+  transform: scale(2.3);
   transform-origin: top left;
 }
 

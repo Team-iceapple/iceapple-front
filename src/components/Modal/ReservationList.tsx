@@ -75,13 +75,13 @@ const ReservationList = ({ studentId, password, setStep, setCancelledData }: Res
 
             await axios.delete(`${API_BASE_URL}/reservations`, {
                 data: {
-                    reservation_id: selectedIds, // ← 중요! reservation_ids 아님
+                    reservation_id: selectedIds,
                 },
                 headers: {
                     "Content-Type": "application/json",
                     Accept: "application/json",
                 },
-            }); // 성공 시 204 No Content 예상
+            });
 
             setCancelledData(cancelledForUI);
             setReservations(prev => prev.filter(r => !selectedIds.includes(r.id)));
@@ -140,7 +140,7 @@ const ReservationList = ({ studentId, password, setStep, setCancelledData }: Res
                     onClick={handleCancel}
                     disabled={selectedIds.length === 0 || loading}
                 >
-                    {loading ? "취소 중..." : "선택 예약 취소"}
+                    {loading ? "취소 중..." : "선택한 예약 삭제"}
                 </button>
             </div>
 

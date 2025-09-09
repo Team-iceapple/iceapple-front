@@ -7,13 +7,17 @@ import axios from "axios";
 
 import baseStyles from "../Project/Project.module.css";
 import reservationStyles from "./RoomReservation.module.css";
-import Modal from "../../components/Modal/Modal.tsx";
+import Modal from "../../components/Modal/Modal";
 
 const API_BASE_URL = `${import.meta.env.VITE_API_BASE_URL}place/api`;
 
 type Room = { id: string; name: string; description?: string };
 
-const timeSlots = ["09:00","10:00","11:00","12:00","13:00","14:00","15:00","16:00","17:00","18:00"];
+const timeSlots = [
+    "09:00","10:00","11:00","12:00","13:00",
+    "14:00","15:00","16:00","17:00","18:00"
+];
+const MAX_SLOTS = 3;
 
 const formatDate = (d: Date) => {
     const yy = d.getFullYear();
@@ -29,11 +33,18 @@ const RoomReservation = () => {
     const [rooms, setRooms] = useState<Room[]>([]);
     const [date, setDate] = useState(new Date());
     const [selectedTime, setSelectedTime] = useState<string[]>([]);
-    const [availability, setAvailability] = useState<number[]>([]); // 0: 가능, 1: 예약됨
+    const [availability, setAvailability] = useState<number[]>([]);
     const [loadingRooms, setLoadingRooms] = useState(false);
     const [loadingAvail, setLoadingAvail] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const [modalOpen, setModalOpen] = useState(false);
+
+    const [toast, setToast] = useState<string | null>(null);
+    const notify = (msg: string) => {
+        setToast(msg);
+        window.clearTimeout((notify as any)._tid);
+        (notify as any)._tid = window.setTimeout(() => setToast(null), 1500);
+    };
 
     const startOfToday = new Date();
     startOfToday.setHours(0, 0, 0, 0);
@@ -79,10 +90,9 @@ const RoomReservation = () => {
                 const counts: number[] = res.data?.count ?? [];
                 const filled = Array.from({ length: 10 }, (_, i) => counts[i] ?? 0);
                 setAvailability(filled);
-                setSelectedTime([]);
+                setSelectedTime([]); // 날짜/회의실 변경 시 초기화
             } catch (e) {
                 setError("예약 현황을 불러오지 못했습니다.");
-                console.error(e);
                 console.error(e);
                 setAvailability(Array(10).fill(1));
             } finally {
@@ -91,6 +101,11 @@ const RoomReservation = () => {
         };
         fetchAvailability();
     }, [roomId, date]);
+
+    const canPickMore = selectedTime.length < MAX_SLOTS;
+
+    const isBlocked = (checked: boolean, reserved: boolean) =>
+        !checked && !canPickMore && !reserved && !loadingAvail;
 
     return (
         <div className={baseStyles.container}>
@@ -110,9 +125,7 @@ const RoomReservation = () => {
                             rooms.map((r) => (
                                 <button
                                     key={r.id}
-                                    className={`${reservationStyles.Button} ${
-                                        r.id === roomId ? reservationStyles.activeButton : ""
-                                    }`}
+                                    className={`${reservationStyles.Button} ${r.id === roomId ? reservationStyles.activeButton : ""}`}
                                     onClick={() => navigate(`/rooms/${r.id}`)}
                                 >
                                     {r.name}
@@ -120,10 +133,11 @@ const RoomReservation = () => {
                             ))
                         )}
                     </div>
+
                     <div className={reservationStyles.calendarWrapper}>
                         <Calendar
                             onChange={(value) => value instanceof Date && setDate(value)}
-                            value={date} // 선택된 날짜 상태
+                            value={date}
                             locale="ko-KR"
                             formatDay={(_, d) => d.getDate().toString()}
                             calendarType="iso8601"
@@ -137,7 +151,7 @@ const RoomReservation = () => {
                             }
                             tileClassName={({ date: d, view }) => {
                                 if (view === "month" && d.toDateString() === new Date().toDateString()) {
-                                    return "today-tile"; // 오늘 날짜에만 파란 글씨
+                                    return "today-tile";
                                 }
                                 return null;
                             }}
@@ -147,10 +161,10 @@ const RoomReservation = () => {
                                 ) : null
                             }
                         />
-
                     </div>
                 </div>
 
+                {/* 오른쪽: 시간표 + 예약 버튼 */}
                 <div className={reservationStyles.tableWrapper}>
                     <div className={reservationStyles.scaledTableWrapper}>
                         <table className="table table-bordered table-hover align-middle text-center">
@@ -165,25 +179,38 @@ const RoomReservation = () => {
                             <tbody>
                             {timeSlots.map((time, index) => {
                                 const reserved = availability[index] === 1;
+                                const checked = selectedTime.includes(time);
+
                                 return (
                                     <tr key={index} className={reservationStyles.timeRow}>
                                         <td>
                                             <div className="form-check d-flex justify-content-center">
                                                 <input
-                                                    className="form-check-input"
+                                                    className={`form-check-input ${
+                                                        !checked && !canPickMore ? reservationStyles.softDisabled : ""
+                                                    }`}
                                                     type="checkbox"
                                                     id={`time-${index}`}
                                                     value={time}
-                                                    checked={selectedTime.includes(time)}
+                                                    checked={checked}
+                                                    onClick={(e) => {
+                                                        if (isBlocked(checked, reserved)) {
+                                                            e.preventDefault();
+                                                            notify(`최대 ${MAX_SLOTS}개까지만 선택할 수 있어요.`);
+                                                        }
+                                                    }}
                                                     onChange={() => {
-                                                        if (reserved) return;
+                                                        if (isBlocked(checked, reserved)) {
+                                                            notify(`최대 ${MAX_SLOTS}개까지만 선택할 수 있어요.`);
+                                                            return;
+                                                        }
+                                                        if (reserved || loadingAvail) return;
                                                         setSelectedTime((prev) =>
-                                                            prev.includes(time)
-                                                                ? prev.filter((t) => t !== time)
-                                                                : [...prev, time]
+                                                            checked ? prev.filter((t) => t !== time) : [...prev, time]
                                                         );
                                                     }}
                                                     disabled={reserved || loadingAvail}
+                                                    aria-disabled={!checked && !canPickMore}
                                                 />
                                             </div>
                                         </td>
@@ -206,7 +233,6 @@ const RoomReservation = () => {
                             </tbody>
                         </table>
                     </div>
-
                     <div className={reservationStyles.reservationButton}>
                         <button
                             className={reservationStyles.Button}
@@ -220,6 +246,12 @@ const RoomReservation = () => {
                     {error && <div className="text-danger mt-2">{error}</div>}
                 </div>
             </div>
+
+            {toast && (
+                <div className={reservationStyles.toast} role="status" aria-live="polite">
+                    {toast}
+                </div>
+            )}
 
             {modalOpen && (
                 <Modal

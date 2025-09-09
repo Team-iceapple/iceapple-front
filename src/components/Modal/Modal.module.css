@@ -57,7 +57,7 @@
     display: flex;
     align-items: flex-start;
     gap: 0.7vw;
-    font-size: 0.7vw;
+    font-size: 1vw;
 }
 
 .dateColumn {
@@ -104,7 +104,7 @@
 .confirmationSuccess {
     color: #4399B5;
     font-weight: bold;
-    font-size: 1.2vw;
+    font-size: 1.3vw;
 }
 
 
@@ -112,15 +112,15 @@
 .checkbox {
     appearance: none;
     -webkit-appearance: none;
-    width: 0.6vw;
-    height: 0.6vw;
+    width: 1vw;
+    height: 1vw;
     border: 2px solid #4399B5;
     border-radius: 50%;
     display: inline-block;
     position: relative;
     cursor: pointer;
     flex-shrink: 0;
-    margin-top: 0.2vw;
+    margin-top: 0.25vw;
 }
 
 .checkbox:checked::before {
@@ -143,6 +143,13 @@
     z-index: 1100;
 }
 
+.empty {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 1vw;
+}
+
 /*입력창*/
 .inputGroup {
     display: flex;
@@ -157,7 +164,7 @@
     padding: 0.8rem 1rem;
     border: 1px solid #4399B5;
     border-radius: 2rem;
-    font-size: 1rem;
+    font-size: 2rem;
     outline: none;
     box-sizing: border-box;
 }
@@ -192,7 +199,7 @@
     padding: 0.5vw 2vw;
     border: none;
     border-radius: 2rem;
-    font-size: 1rem;
+    font-size: 2rem;
     cursor: pointer;
 }
 
