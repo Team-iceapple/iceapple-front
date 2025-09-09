@@ -31,11 +31,12 @@ function transformHtml(raw: string): string {
     const norm = (s: string) =>
         (s || "")
             .replace(/<br\s*\/?>/gi, "")
-            .replace(/&nbsp;/g, "")
-            .replace(/\s+/g, "")
+            .replace(/&nbsp;/g, " ")
+            .replace(/\s+/g, " ")
             .replace(/[\u200B-\u200D\uFEFF]/g, "")
             .trim();
-    const getPText = (el: Element) => norm(el.textContent || "");
+
+    const textOf = (el: Element) => norm(el.textContent || "");
 
     root.querySelectorAll("img").forEach((img) => {
         img.setAttribute("loading", "lazy");
@@ -44,7 +45,6 @@ function transformHtml(raw: string): string {
     root.querySelectorAll("iframe, video, object, embed").forEach((el) => {
         (el as HTMLElement).classList.add(styles.responsiveMedia);
     });
-
     root.querySelectorAll<HTMLAnchorElement>("a[href$='.pdf']").forEach((a) => {
         const href = a.getAttribute("href") || "";
         if (!href) return;
@@ -63,251 +63,270 @@ function transformHtml(raw: string): string {
         a.replaceWith(wrap);
     });
 
-    const HEADER_SETS: string[][] = [
-        ["학년", "학기", "교과구분", "이수구분", "교과코드", "교과목명", "학점", "시수", "복수전공", "부전공", "이론", "실습"],
-        ["학과", "수강 제한 교과목"],
-    ];
+    const pEls = Array.from(root.querySelectorAll("p"));
+    const tokensAll = pEls.map(textOf).filter((t) => t !== "");
 
-    const pNodes = Array.from(root.querySelectorAll("p")).filter((p) => !p.closest("table"));
+    type TokType = "NUM" | "CODE" | "TIME" | "QUANT" | "TEXT" | "SUM";
+    const timeRe = /^\[?\d{1,2}:\d{2}\s*[~∼-]\s*\d{1,2}:\d{2}\]?$/;
+    const quantRe = /^\d{1,3}(?:,\d{3})*(?:명|개|원|회|주|일|학점)?$/;
+    const isNum = (t: string) => /^\d+$/.test(t);
+    const isCode = (t: string) => /^[A-Z0-9\-]+$/.test(t) && /[A-Z]/.test(t) && /\d/.test(t);
+    const isTime = (t: string) => timeRe.test(t);
+    const isQuant = (t: string) => quantRe.test(t);
+    const typeOf = (t: string): TokType =>
+        t === "합계" ? "SUM" : isTime(t) ? "TIME" : isQuant(t) ? "QUANT" : isNum(t) ? "NUM" : isCode(t) ? "CODE" : "TEXT";
 
-    if (DEBUG) {
-        console.groupCollapsed("[NoticeDetail] pNodes (원본 <p> 목록)");
-        pNodes.forEach((p, i) => {
-            console.log(i, { text: (p.textContent || "").trim(), html: p.outerHTML });
-        });
-        console.groupEnd();
-    }
-
-    const indexMap = new Map<Element, number>();
-    pNodes.forEach((el, i) => indexMap.set(el, i));
-
-    function matchHeaderAt(start: number, header: string[]): number | null {
+    function scoreK(start: number, k: number) {
         let i = start;
-        for (let j = 0; j < header.length; j++) {
-            while (i < pNodes.length && getPText(pNodes[i]) === "") i++;
-            if (i >= pNodes.length) return null;
-            if (getPText(pNodes[i]) !== norm(header[j])) return null;
-            i++;
-        }
-        return i;
-    }
-
-    const isHeaderStartIdx = (idx: number) => {
-        for (const h of HEADER_SETS) {
-            const matched = matchHeaderAt(idx, h);
-            if (matched != null) return true;
-        }
-        return false;
-    };
-
-    type Block = { headerStart: number; dataStart: number; header: string[] };
-    const headerBlocks: Block[] = [];
-    for (const header of HEADER_SETS) {
-        for (let i = 0; i < pNodes.length; i++) {
-            const dataStart = matchHeaderAt(i, header);
-            if (dataStart != null) {
-                headerBlocks.push({ headerStart: i, dataStart, header });
-                i = dataStart - 1;
+        let rows = 0;
+        let consistency = 0;
+        const colTypes: Record<number, Record<TokType, number>> = {};
+        while (i < tokensAll.length) {
+            if (tokensAll[i] === "합계") {
+                if (tokensAll[i + 1] && /^(?:\d+|[\d,]+)$/.test(tokensAll[i + 1])) i += 2;
+                else i += 1;
+                rows++;
+                break;
+            }
+            const slice = tokensAll.slice(i, i + k);
+            if (slice.length < k) break;
+            if (slice.every((t) => t === "")) break;
+            slice.forEach((t, ci) => {
+                const ty = typeOf(t);
+                (colTypes[ci] ??= { NUM: 0, CODE: 0, TIME: 0, QUANT: 0, TEXT: 0, SUM: 0 } as any)[ty]++;
+            });
+            rows++;
+            i += k;
+            if (rows >= 2 && i < tokensAll.length) {
+                const nxt = tokensAll.slice(i, i + k);
+                const txtRatio = nxt.filter((t) => typeOf(t) === "TEXT").length / Math.max(nxt.length, 1);
+                if (txtRatio > 0.85) break;
             }
         }
+        for (const ci in colTypes) {
+            const counts = colTypes[ci] as Record<TokType, number>;
+            const max = Math.max(counts.NUM, counts.CODE, counts.TIME, counts.QUANT, counts.TEXT, counts.SUM);
+            const total = counts.NUM + counts.CODE + counts.TIME + counts.QUANT + counts.TEXT + counts.SUM;
+            if (total) consistency += max / total;
+        }
+        return rows * 2 + consistency;
     }
 
-    headerBlocks.sort((a, b) => b.headerStart - a.headerStart);
-
-    if (DEBUG) {
-        console.groupCollapsed("[NoticeDetail] 헤더 블록 감지 결과");
-        headerBlocks.forEach((b, i) => {
-            console.log(i, {
-                header: b.header,
-                headerStart: b.headerStart,
-                dataStart: b.dataStart,
-                headerPreview: b.header.join("|"),
-                at: pNodes.slice(b.headerStart, b.dataStart).map(getPText),
-            });
-        });
-        console.groupEnd();
+    function validateTable(start: number, k: number, end: number) {
+        if (k < 3 || end - start < k * 2) return false;
+        const header = tokensAll.slice(Math.max(0, start - k), start).slice(-k);
+        if (header.length !== k) return false;
+        const headerTypes = header.map(typeOf);
+        const headerTextRatio = headerTypes.filter((t) => t === "TEXT").length / k;
+        const headerAvgLen = header.reduce((a, b) => a + b.length, 0) / k;
+        if (!(headerTextRatio >= 0.6 && headerAvgLen <= 12)) return false;
+        const lookahead = tokensAll.slice(start, Math.min(end, start + k * 3));
+        const hasTimeOrQuant = lookahead.some((t) => isTime(t) || isQuant(t));
+        let i = start;
+        let dataRows = 0;
+        let signalCells = 0;
+        let allCells = 0;
+        while (i < end) {
+            if (tokensAll[i] === "합계") {
+                i += isNum(tokensAll[i + 1] || "") ? 2 : 1;
+                continue;
+            }
+            const row = tokensAll.slice(i, i + k);
+            if (row.length < k) break;
+            const types = row.map(typeOf);
+            const sig = types.filter((t) => t === "NUM" || t === "CODE" || t === "TIME" || t === "QUANT").length;
+            signalCells += sig;
+            allCells += k;
+            dataRows++;
+            i += k;
+        }
+        if (dataRows < 2) return false;
+        const density = signalCells / Math.max(allCells, 1);
+        if (!(density >= 0.15 || hasTimeOrQuant)) return false;
+        return true;
     }
 
-    for (const { headerStart, dataStart, header } of headerBlocks) {
-        const colCount = header.length;
+    const tables: Array<{ start: number; k: number; end: number }> = [];
+    let cursor = 0;
+    while (cursor < tokensAll.length) {
+        let best = { k: 0, score: 0, start: -1, end: -1 };
+        for (let k = 2; k <= 14; k++) {
+            const s = scoreK(cursor, k);
+            if (s > best.score) best = { k, score: s, start: cursor, end: -1 };
+        }
+        if (best.k === 0 || best.score < 5) {
+            cursor++;
+            continue;
+        }
+        let i = best.start;
+        while (i < tokensAll.length) {
+            if (tokensAll[i] === "합계") {
+                i += isNum(tokensAll[i + 1] || "") ? 2 : 1;
+                break;
+            }
+            const row = tokensAll.slice(i, i + best.k);
+            if (row.length < best.k) break;
+            i += best.k;
+            const nxt = tokensAll.slice(i, i + best.k);
+            const txtRatio = nxt.filter((t) => typeOf(t) === "TEXT").length / Math.max(nxt.length, 1);
+            if (txtRatio > 0.9) break;
+        }
+        best.end = i;
+        if (validateTable(best.start, best.k, best.end)) {
+            tables.push({ start: best.start, k: best.k, end: best.end });
+            cursor = best.end + 1;
+        } else {
+            cursor = best.start + 1;
+        }
+    }
+
+    if (!tables.length) {
+        finalize(root, doc);
+        return root.innerHTML;
+    }
+
+    for (const tbl of tables) {
+        const headerTokens = tokensAll.slice(Math.max(0, tbl.start - tbl.k), tbl.start);
+        const header = headerTokens.slice(-tbl.k);
+
+        const rows: string[][] = [];
+        let i = tbl.start;
+        while (i < tbl.end) {
+            if (tokensAll[i] === "합계") {
+                const sumVal = isNum(tokensAll[i + 1] || "") ? tokensAll[i + 1] : "";
+                const tr: string[] = Array(tbl.k).fill("");
+                tr[0] = sumVal ? `합계 ${sumVal}` : "합계";
+                rows.push(tr);
+                i += sumVal ? 2 : 1;
+                continue;
+            }
+            const base = tokensAll.slice(i, i + tbl.k);
+            if (base.length < tbl.k) break;
+
+            if (tbl.k === 4) {
+                const first = base[0] ?? "";
+                const second = base[1] ?? "";
+                const rest = tokensAll.slice(i + 2, Math.min(tbl.end, i + 2 + 12));
+                let j = 0;
+                let produced = 0;
+                while (j < rest.length) {
+                    const t1 = rest[j];
+                    const t2 = rest[j + 1];
+                    if (!t1) break;
+                    const isPair =
+                        (isTime(t1) || typeOf(t1) !== "TEXT") &&
+                        (t2 ? (isQuant(t2) || typeOf(t2) !== "TEXT" || isTime(t2)) : true);
+                    if (!isPair) break;
+                    const r: string[] = [first, second, t1, t2 || ""];
+                    rows.push(r);
+                    j += 2;
+                    produced++;
+                }
+                if (produced > 0) {
+                    i += 2 + j;
+                    continue;
+                }
+            }
+
+            while (base.length < tbl.k) base.push("");
+            rows.push(base);
+            i += tbl.k;
+        }
 
         const wrap = doc.createElement("div");
         wrap.className = styles.tableWrap;
         const table = doc.createElement("table");
         table.classList.add(styles.table);
+
         const thead = doc.createElement("thead");
-        const headTr = doc.createElement("tr");
+        const trh = doc.createElement("tr");
         header.forEach((h) => {
             const th = doc.createElement("th");
             th.textContent = h;
-            headTr.appendChild(th);
+            trh.appendChild(th);
         });
-        thead.appendChild(headTr);
+        thead.appendChild(trh);
         table.appendChild(thead);
+
         const tbody = doc.createElement("tbody");
+        rows.forEach((r) => {
+            const tr = doc.createElement("tr");
+            if (r[0].startsWith("합계")) {
+                const td = doc.createElement("td");
+                td.colSpan = tbl.k;
+                td.textContent = r[0];
+                tr.appendChild(td);
+            } else {
+                r.forEach((cell) => {
+                    const td = doc.createElement("td");
+                    td.textContent = cell;
+                    tr.appendChild(td);
+                });
+            }
+            tbody.appendChild(tr);
+        });
         table.appendChild(tbody);
         wrap.appendChild(table);
 
-        const headerPs: Element[] = [];
-        {
-            let scan = headerStart;
-            let j = 0;
-            while (scan < dataStart && j < header.length) {
-                const t = getPText(pNodes[scan]);
-                if (t === "") {
-                    scan++;
-                    continue;
-                }
-                if (t === norm(header[j])) {
-                    headerPs.push(pNodes[scan]);
-                    j++;
-                }
-                scan++;
+        let anchor: Element | null = null;
+        for (let pi = 0; pi < pEls.length; pi++) {
+            if (textOf(pEls[pi]) === tokensAll[tbl.start]) {
+                anchor = pEls[pi];
+                break;
             }
         }
-
-        let anchorP: Element | null = null;
-        if (headerPs.length) {
-            anchorP = headerPs[0];
+        if (anchor) {
+            anchor.replaceWith(wrap);
+            let cnt = 1;
+            while (cnt < tbl.end - tbl.start) {
+                const next = anchor?.nextElementSibling as Element | null;
+                if (!next || next.tagName.toLowerCase() !== "p") break;
+                next.remove();
+                cnt++;
+            }
         } else {
-            for (let i = headerStart; i < Math.min(dataStart, pNodes.length); i++) {
-                if (getPText(pNodes[i]) !== "") {
-                    anchorP = pNodes[i];
-                    break;
-                }
-            }
-            if (!anchorP) {
-                if (DEBUG) console.warn("[NoticeDetail] 표 앵커를 찾지 못해 스킵:", { headerStart, dataStart, header });
-                continue;
-            }
-        }
-
-        if (DEBUG) {
-            console.groupCollapsed("[NoticeDetail] 테이블 생성 시작");
-            console.log("헤더:", header.join(" | "));
-            console.log("데이터 시작 인덱스:", dataStart, "열 수:", colCount);
-            console.log("앵커:", anchorP);
-            console.groupEnd();
-        }
-
-        let idx = dataStart;
-        while (idx < pNodes.length) {
-            let probe = idx;
-            while (probe < pNodes.length && getPText(pNodes[probe]) === "") probe++;
-            if (probe < pNodes.length) {
-                const probeEl = pNodes[probe];
-                const probeIdx = indexMap.get(probeEl);
-                if (probeIdx != null && isHeaderStartIdx(probeIdx)) break;
-            }
-
-            while (idx < pNodes.length && getPText(pNodes[idx]) === "") idx++;
-            if (idx < pNodes.length && /합계/.test(getPText(pNodes[idx]))) {
-                const sumLabel = getPText(pNodes[idx]);
-                idx++;
-                while (idx < pNodes.length && getPText(pNodes[idx]) === "") idx++;
-                const sumVal = idx < pNodes.length ? getPText(pNodes[idx]) : "";
-                if (sumVal) idx++;
-                const tr = doc.createElement("tr");
-                const td = doc.createElement("td");
-                td.colSpan = colCount;
-                td.textContent = sumVal ? `${sumLabel} ${sumVal}` : sumLabel;
-                tr.appendChild(td);
-                tbody.appendChild(tr);
-                if (DEBUG) console.log("합계 행:", td.textContent);
-                continue;
-            }
-
-            const row: string[] = [];
-            while (idx < pNodes.length && row.length < colCount) {
-                const t = getPText(pNodes[idx]);
-                const el = pNodes[idx];
-                idx++;
-                if (t === "") continue;
-                const curIdx = indexMap.get(el);
-                if (row.length === 0 && curIdx != null && isHeaderStartIdx(curIdx)) {
-                    idx--;
-                    break;
-                }
-                row.push(t);
-            }
-            if (!row.length) break;
-            while (row.length < colCount) row.push("");
-            const tr = doc.createElement("tr");
-            row.forEach((v) => {
-                const td = doc.createElement("td");
-                td.textContent = v;
-                tr.appendChild(td);
-            });
-            tbody.appendChild(tr);
-            if (DEBUG) console.log("행:", row);
-        }
-
-        anchorP.replaceWith(wrap);
-
-        headerPs.forEach((p) => {
-            try {
-                p.remove();
-            } catch {}
-        });
-
-        let cursor = wrap.nextElementSibling;
-        while (cursor && cursor.tagName.toLowerCase() === "p") {
-            const mappedIdx = indexMap.get(cursor);
-            if (mappedIdx != null && isHeaderStartIdx(mappedIdx)) break;
-            const next = cursor.nextElementSibling;
-            cursor.remove();
-            cursor = next;
+            root.appendChild(wrap);
         }
     }
 
-    if (DEBUG) {
-        const tableCnt = root.querySelectorAll("table").length;
-        console.log("[NoticeDetail] 변환 후 table 수:", tableCnt);
-        console.log("[NoticeDetail] '<table>' 포함?", root.innerHTML.includes("<table"));
-    }
-
-    const looseCells = Array.from(root.querySelectorAll("th, td")).filter((cell) => !cell.closest("table"));
-    if (looseCells.length) {
-        const parents = Array.from(new Set(looseCells.map((c) => c.parentElement).filter(Boolean))) as HTMLElement[];
-        parents.forEach((parent) => {
-            const cells = Array.from(parent.querySelectorAll(":scope > th, :scope > td"));
-            if (!cells.length) return;
-            const tableWrap = doc.createElement("div");
-            tableWrap.className = styles.tableWrap;
-            const table = doc.createElement("table");
-            table.classList.add(styles.table);
-            const tbody = doc.createElement("tbody");
-            const tr = doc.createElement("tr");
-            cells.forEach((c) => tr.appendChild(c));
-            tbody.appendChild(tr);
-            table.appendChild(tbody);
-            tableWrap.appendChild(table);
-            parent.replaceWith(tableWrap);
-        });
-    }
-
-    const kogl = doc.createElement("div");
-    kogl.className = styles.koglBadge;
-    const iconImg = doc.createElement("img");
-    iconImg.src = KOGL_ICON;
-    iconImg.alt = "공공누리 제4유형";
-    iconImg.className = styles.koglIcon;
-    iconImg.onerror = () => ((iconImg as any).style = "display:none;");
-    const text = doc.createElement("span");
-    text.className = styles.koglText;
-    text.textContent = KOGL_TEXT;
-    kogl.appendChild(iconImg);
-    kogl.appendChild(text);
-    root.appendChild(kogl);
-
-    if (DEBUG) {
-        console.groupCollapsed("[NoticeDetail] 최종 HTML (일부 미리보기)");
-        const preview = root.innerHTML.slice(0, 800);
-        console.log(preview + (root.innerHTML.length > 800 ? " ...[더 있음]" : ""));
-        console.groupEnd();
-    }
-
+    finalize(root, doc);
     return root.innerHTML;
+
+    function finalize(rootEl: HTMLElement, d: Document) {
+        const kogl = d.createElement("div");
+        kogl.className = styles.koglBadge;
+        const iconImg = d.createElement("img");
+        iconImg.src = KOGL_ICON;
+        iconImg.alt = "공공누리 제4유형";
+        iconImg.className = styles.koglIcon;
+        (iconImg as any).onerror = () => ((iconImg as any).style = "display:none;");
+        const text = d.createElement("span");
+        text.className = styles.koglText;
+        text.textContent = KOGL_TEXT;
+        kogl.appendChild(iconImg);
+        kogl.appendChild(text);
+        rootEl.appendChild(kogl);
+
+        const looseCells = Array.from(rootEl.querySelectorAll("th, td")).filter((c) => !c.closest("table"));
+        if (looseCells.length) {
+            const parents = Array.from(new Set(looseCells.map((c) => c.parentElement).filter(Boolean))) as HTMLElement[];
+            parents.forEach((parent) => {
+                const cells = Array.from(parent.querySelectorAll(":scope > th, :scope > td"));
+                if (!cells.length) return;
+                const tableWrap = d.createElement("div");
+                tableWrap.className = styles.tableWrap;
+                const table = d.createElement("table");
+                table.classList.add(styles.table);
+                const tbody = d.createElement("tbody");
+                const tr = d.createElement("tr");
+                cells.forEach((c) => tr.appendChild(c));
+                tbody.appendChild(tr);
+                table.appendChild(tbody);
+                tableWrap.appendChild(table);
+                parent.replaceWith(tableWrap);
+            });
+        }
+    }
 }
 
 const NoticeDetail = ({ id, onClose }: Props) => {
@@ -318,8 +337,8 @@ const NoticeDetail = ({ id, onClose }: Props) => {
     const apiBase = useMemo(() => import.meta.env.VITE_API_BASE_URL, []);
 
     useEffect(() => {
-        if (DEBUG) console.log("[NoticeDetail] fetch start:", `${apiBase}notice/api/mobile/${id}`);
-        fetch(`${apiBase}notice/api/mobile/${id}`)
+        if (DEBUG) console.log("[NoticeDetail] fetch start:", `${apiBase}notice/mobile/${id}`);
+        fetch(`${apiBase}notice/mobile/${id}`)
             .then((res) => {
                 if (!res.ok) throw new Error(`HTTP error ${res.status}`);
                 return res.json();
@@ -359,19 +378,22 @@ const NoticeDetail = ({ id, onClose }: Props) => {
         return () => links.forEach((link) => link.removeEventListener("click", onClick));
     }, [processedHtml]);
 
+    const handleOverlayClick = (e: React.MouseEvent<HTMLDivElement>) => {
+        if (e.currentTarget === e.target) onClose();
+    };
+
     if (error) return <div>{error}</div>;
     if (!notice) return <div />;
 
     const showInline = !(notice.has_attachment && isEmptyHtml(notice.content));
 
     return (
-        <div className={styles.modalOverlay}>
-            <div className={styles.modalContent}>
+        <div className={styles.modalOverlay} onClick={handleOverlayClick}>
+            <div className={styles.modalContent} onClick={(e) => e.stopPropagation()}>
                 <button className={styles.backButton} onClick={onClose}>
                     X
                 </button>
                 <h2>{notice.title}</h2>
-                <p className={styles.createdAt}>{notice.createdAt}</p>
                 <hr />
                 {showInline ? (
                     <div id="notice-content" className={styles.modalNoticeContent} dangerouslySetInnerHTML={{ __html: processedHtml }} />
@@ -379,8 +401,7 @@ const NoticeDetail = ({ id, onClose }: Props) => {
                     <p className={styles.modalNoticeMessage}>웹에서 확인해주세요 (첨부파일 있음)</p>
                 )}
             </div>
-
-            <div className={styles.qrContainer}>
+            <div className={styles.qrContainer} onClick={(e) => e.stopPropagation()}>
                 <p>&nbsp; 모바일에서 확인하려면 QR을 스캔하세요</p>
                 <QRCode value={`${window.location.origin}/notice/${notice.id}`} size={128} />
             </div>

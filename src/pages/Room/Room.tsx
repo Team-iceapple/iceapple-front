@@ -6,7 +6,7 @@ import Modal from "../../components/Modal/Modal.tsx";
 import { Icon } from "@iconify/react";
 import axios from "axios";
 
-const API_BASE_URL = `${import.meta.env.VITE_API_BASE_URL}place/api`;
+const API_BASE_URL = `${import.meta.env.VITE_API_BASE_URL}place/`;
 
 interface Room {
     id: string;

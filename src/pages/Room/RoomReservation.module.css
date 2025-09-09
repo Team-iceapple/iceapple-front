@@ -85,21 +85,7 @@
     text-align: center;
     margin-top: 15vw;
     position: relative;
-    z-index: 1;
-    margin-right: 20vw ;
+    margin-left: -20vw;
 }
 
-.toast {
-    position: fixed;
-    left: 50%;
-    bottom: 50vh;
-    transform: translateX(-50%);
-    background: rgba(33, 33, 33, 0.92);
-    color: #fff;
-    padding: 1vh 1.5vh;
-    border-radius: 1vh;
-    font-weight: 600;
-    font-size: 1vh;
-    pointer-events: none;
-    z-index: 20000;
-}
+

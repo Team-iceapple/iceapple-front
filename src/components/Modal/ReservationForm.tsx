@@ -3,7 +3,7 @@ import styles from "./Modal.module.css";
 import NumberPad from "../NumberPad/NumberPad.tsx";
 import axios, { AxiosError } from "axios";
 
-const API_BASE_URL = `${import.meta.env.VITE_API_BASE_URL}place/api`;
+const API_BASE_URL = `${import.meta.env.VITE_API_BASE_URL}place`;
 
 type Props = {
     date: Date;

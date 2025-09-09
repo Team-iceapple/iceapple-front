@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import Calendar from "react-calendar";
 import "react-calendar/dist/Calendar.css";
@@ -9,7 +9,7 @@ import baseStyles from "../Project/Project.module.css";
 import reservationStyles from "./RoomReservation.module.css";
 import Modal from "../../components/Modal/Modal";
 
-const API_BASE_URL = `${import.meta.env.VITE_API_BASE_URL}place/api`;
+const API_BASE_URL = `${import.meta.env.VITE_API_BASE_URL}place/`;
 
 type Room = { id: string; name: string; description?: string };
 
@@ -39,12 +39,8 @@ const RoomReservation = () => {
     const [error, setError] = useState<string | null>(null);
     const [modalOpen, setModalOpen] = useState(false);
 
-    const [toast, setToast] = useState<string | null>(null);
-    const notify = (msg: string) => {
-        setToast(msg);
-        window.clearTimeout((notify as any)._tid);
-        (notify as any)._tid = window.setTimeout(() => setToast(null), 1500);
-    };
+    const [toast, setToast] = useState<{ msg: string; x: number; y: number } | null>(null);
+    const toastTimerRef = useRef<number | null>(null);
 
     const startOfToday = new Date();
     startOfToday.setHours(0, 0, 0, 0);
@@ -56,6 +52,24 @@ const RoomReservation = () => {
     };
 
     const isCapstoneRoom = useMemo(() => roomId === "capstone", [roomId]);
+
+    const notifyAt = (msg: string, x: number, y: number) => {
+        setToast({ msg, x, y });
+        if (toastTimerRef.current) window.clearTimeout(toastTimerRef.current);
+        toastTimerRef.current = window.setTimeout(() => setToast(null), 1500);
+    };
+
+    const notifyAboveElement = (
+        e: React.MouseEvent<HTMLInputElement, MouseEvent>,
+        msg: string
+    ) => {
+        const el = e.currentTarget as HTMLElement;
+        const rect = el.getBoundingClientRect();
+        const centerX = rect.left + rect.width / 2;
+        const topY = rect.top;
+        const OFFSET = 12;
+        notifyAt(msg, centerX, topY - OFFSET);
+    };
 
     useEffect(() => {
         const fetchRooms = async () => {
@@ -90,7 +104,7 @@ const RoomReservation = () => {
                 const counts: number[] = res.data?.count ?? [];
                 const filled = Array.from({ length: 10 }, (_, i) => counts[i] ?? 0);
                 setAvailability(filled);
-                setSelectedTime([]); // 날짜/회의실 변경 시 초기화
+                setSelectedTime([]);
             } catch (e) {
                 setError("예약 현황을 불러오지 못했습니다.");
                 console.error(e);
@@ -164,7 +178,6 @@ const RoomReservation = () => {
                     </div>
                 </div>
 
-                {/* 오른쪽: 시간표 + 예약 버튼 */}
                 <div className={reservationStyles.tableWrapper}>
                     <div className={reservationStyles.scaledTableWrapper}>
                         <table className="table table-bordered table-hover align-middle text-center">
@@ -196,12 +209,12 @@ const RoomReservation = () => {
                                                     onClick={(e) => {
                                                         if (isBlocked(checked, reserved)) {
                                                             e.preventDefault();
-                                                            notify(`최대 ${MAX_SLOTS}개까지만 선택할 수 있어요.`);
+                                                            notifyAboveElement(e, `최대 ${MAX_SLOTS}개까지만 선택할 수 있어요.`);
                                                         }
                                                     }}
-                                                    onChange={() => {
+                                                    onChange={(e) => {
                                                         if (isBlocked(checked, reserved)) {
-                                                            notify(`최대 ${MAX_SLOTS}개까지만 선택할 수 있어요.`);
+                                                            notifyAboveElement(e, `최대 ${MAX_SLOTS}개까지만 선택할 수 있어요.`);
                                                             return;
                                                         }
                                                         if (reserved || loadingAvail) return;
@@ -248,8 +261,30 @@ const RoomReservation = () => {
             </div>
 
             {toast && (
-                <div className={reservationStyles.toast} role="status" aria-live="polite">
-                    {toast}
+                <div
+                    className={reservationStyles.toast}
+                    role="status"
+                    aria-live="polite"
+                    style={{
+                        position: "fixed",
+                        top: Math.max(8, toast.y),
+                        left: toast.x,
+                        transform: "translate(-50%, -100%)",
+                        backgroundColor: "rgba(0, 0, 0, 0.78)",
+                        color: "white",
+                        padding: "8px 14px",
+                        borderRadius: 8,
+                        fontSize: 14,
+                        fontWeight: 600,
+                        zIndex: 3000,
+                        pointerEvents: "none",
+                        boxShadow: "0 6px 20px rgba(0,0,0,.22)",
+                        transition: "opacity .2s ease",
+                        opacity: 1,
+                        whiteSpace: "nowrap",
+                    }}
+                >
+                    {toast.msg}
                 </div>
             )}
 

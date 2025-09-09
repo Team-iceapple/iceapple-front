@@ -31,7 +31,7 @@ const Notice = () => {
     const [notices, setNotices] = useState<NoticeItem[]>([]);
 
     useEffect(() => {
-        const url = `${import.meta.env.VITE_API_BASE_URL}notice/api/mobile`;
+        const url = `${import.meta.env.VITE_API_BASE_URL}notice/mobile`;
         console.log("📡 실제 요청 URL:", url);
 
         fetch(url)
@@ -48,9 +48,6 @@ const Notice = () => {
             });
     }, []);
 
-
-
-
     const handleClick = (noticeId: string) => {
         navigate(`/notice/${noticeId}`);
     };
@@ -61,7 +58,7 @@ const Notice = () => {
 
     const selectedNotice = notices.find((n) => n.id === id);
 
-    const pinned = notices.filter((n) => n.is_pin).slice(0,3);
+    const pinned = notices.filter((n) => n.is_pin).slice(0, 3);
     const unpinned = notices.filter((n) => !n.is_pin);
 
     const sorted = [...pinned, ...unpinned];
@@ -109,7 +106,9 @@ const Notice = () => {
                                         </div>
                                     )}
                                     <div>
-                                        <p className={styles["notice-content-title"]}>
+                                        <p
+                                            className={`${styles["notice-content-title"]} ${notice.is_pin ? styles["pinned-title"] : ""}`}
+                                        >
                                             {notice.title.length > 75
                                                 ? `${notice.title.slice(0, 70)}...`
                                                 : notice.title}

@@ -35,11 +35,16 @@
     border-radius: 1.3889vw;
 }
 
+.pinned-title {
+    font-weight: bold;
+}
+
 .notice-content-id {
     font-weight: bold;
     margin-right: 1vw;
     width: 3vw;
     text-align: center;
+    font-size: 0.7vw;
 }
 
 .notice-pin-icon {
@@ -49,8 +54,9 @@
     margin-left: 0.8vw;
 }
 
+
 .notice-content-title {
-    margin-top: 0.7vw;
+    margin-top: 0.5vw;
     flex-grow: 1;
     font-size: 1.2vw;
     white-space: nowrap;

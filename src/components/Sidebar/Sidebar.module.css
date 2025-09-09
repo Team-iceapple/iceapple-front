@@ -11,9 +11,8 @@
 }
 
 .logo {
-    width: 5.059vw;
-    height: 6vw;
-    margin: 2vw 0;
+    width: 8vw;
+    margin: 1.5vw 0;
 }
 
 .icon {
@@ -33,7 +32,7 @@
     width: 100%;
     height: 1px;
     background-color: #dcdcdc;
-    margin: 2vw 0;
+    margin: 1vw 0;
 }
 
 .nav {
@@ -79,38 +78,38 @@
     background: rgba(0,0,0,0.35);
 }
 
-.sheet {
-    width: 100%;
-    max-width: 560px;
-    background: #ffffff;
-    border-radius: 20px 20px 0 0;
-    box-shadow: 0 -8px 24px rgba(0,0,0,0.2);
-    transform: translateY(100%);
-    transition: transform .18s ease-out;
-    padding: 24px 20px 20px;
-}
-.slideUp {
-    transform: translateY(0);
-}
+/*.sheet {*/
+/*    width: 100%;*/
+/*    max-width: 560px;*/
+/*    background: #ffffff;*/
+/*    border-radius: 20px 20px 0 0;*/
+/*    box-shadow: 0 -8px 24px rgba(0,0,0,0.2);*/
+/*    transform: translateY(100%);*/
+/*    transition: transform .18s ease-out;*/
+/*    padding: 24px 20px 20px;*/
+/*}*/
+/*.slideUp {*/
+/*    transform: translateY(0);*/
+/*}*/
 
-.sheetHandle {
-    width: 60px;
-    height: 6px;
-    border-radius: 999px;
-    background: #e5e7eb;
-    margin: 0 auto 12px;
-}
+/*.sheetHandle {*/
+/*    width: 60px;*/
+/*    height: 6px;*/
+/*    border-radius: 999px;*/
+/*    background: #e5e7eb;*/
+/*    margin: 0 auto 12px;*/
+/*}*/
 
-.sheetTitle {
-    font-size: 22px;
-    font-weight: 800;
-    text-align: center;
-    margin: 4px 0 16px;
-}
+/*.sheetTitle {*/
+/*    font-size: 22px;*/
+/*    font-weight: 800;*/
+/*    text-align: center;*/
+/*    !*margin: 4px 0 10px;*!*/
+/*}*/
 
 .sheetButtons {
     display: grid;
-    gap: 16px;
+    gap: 10px;
     margin-bottom: 12px;
 }
 .kioskBtn {

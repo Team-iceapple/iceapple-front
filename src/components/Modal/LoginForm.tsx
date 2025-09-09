@@ -1,8 +1,8 @@
 import { useState } from "react";
 import styles from "./Modal.module.css";
-import logo from "/logo.svg";
+import logo from "/logo2.svg";
 import NumberPad from "../NumberPad/NumberPad.tsx";
-import axios from "axios";
+import axios, { AxiosError } from "axios";
 
 type Step = "login" | "loginError" | "reservationList";
 
@@ -14,10 +14,9 @@ interface LoginFormProps {
     setLoginPassword: (p: string) => void;
 }
 
-const API_BASE_URL = `${import.meta.env.VITE_API_BASE_URL}place/api`;
+const API_BASE_URL = `${import.meta.env.VITE_API_BASE_URL}place`;
 
 const LoginForm = ({
-                       step,
                        setStep,
                        studentId,
                        setStudentId,
@@ -27,25 +26,49 @@ const LoginForm = ({
     const [currentInput, setCurrentInput] =
         useState<"studentId" | "password" | null>(null);
     const [loading, setLoading] = useState(false);
+    const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
     const handleSubmit = async () => {
-        if (!studentId || password.length !== 4) {
+        if (!/^\d{8}$/.test(studentId)) {
+            setErrorMsg("학번");
             setStep("loginError");
             return;
         }
-        setLoading(true);
-        try {
-            await axios.post(`${API_BASE_URL}/reservations/reservation-info`, {
-                student_number: studentId,
-                password,
-            });
-
-            setLoginPassword(password);
-            setStep("reservationList");
-        } catch (e) {
-            console.error(e);
+        if (!/^\d{4}$/.test(password)) {
+            setErrorMsg("비밀번호 4자리");
             setStep("loginError");
-        } finally {
+            return;
+        }
+
+        setLoading(true);
+        setErrorMsg(null);
+
+        try {
+            const { data, status } = await axios.post(
+                `${API_BASE_URL}/reservations/reservation-info`,
+                { student_number: studentId, password },
+                { headers: { "Content-Type": "application/json", Accept: "application/json" } }
+            );
+
+            const ok =
+                status === 200 &&
+                (Array.isArray(data) || data?.authorized === true || data?.success === true);
+
+            if (ok) {
+                setLoginPassword(password);
+                setStep("reservationList");
+            } else {
+                setErrorMsg(data?.message || "학번 또는 비밀번호가 올바르지 않습니다.");
+                setStep("loginError");
+            }
+        } catch (e: any) {
+            const code = e?.response?.status;
+            if (code === 401) setErrorMsg("학번 또는 비밀번호가 올바르지 않습니다.");
+            else if (code === 404) setErrorMsg("학번 또는 비밀번호가 올바르지 않습니다.");
+            else setErrorMsg(e?.response?.data?.message || "로그인 중 오류가 발생했습니다.");
+            setStep("loginError");
+        }
+        finally {
             setLoading(false);
         }
     };
@@ -59,7 +82,7 @@ const LoginForm = ({
             <div className={styles.inputGroup}>
                 <input
                     className={`${styles.input} ${currentInput === "studentId" ? styles.inputActive : ""}`}
-                    placeholder="학번"
+                    placeholder="학번 (8자리)"
                     value={studentId}
                     onFocus={() => setCurrentInput("studentId")}
                     readOnly
@@ -76,21 +99,24 @@ const LoginForm = ({
 
             {currentInput === "studentId" && (
                 <div className={styles.numpadWrap}>
-                    <NumberPad value={studentId} setValue={setStudentId} maxLength={10} />
+                    <NumberPad
+                        value={studentId}
+                        setValue={(v) => setStudentId(v.replace(/\D/g, "").slice(0, 8))}
+                        maxLength={8}
+                    />
                 </div>
             )}
             {currentInput === "password" && (
                 <div className={styles.numpadWrap}>
                     <NumberPad
                         value={password}
-                        setValue={(v) => setPassword(v.slice(0, 4))}
+                        setValue={(v) => setPassword(v.replace(/\D/g, "").slice(0, 4))}
+                        maxLength={4}
                     />
                 </div>
             )}
 
-            <p className={styles.errorText}>
-                {step === "loginError" ? "학번 또는 비밀번호가 올바르지 않습니다." : "\u00A0"}
-            </p>
+            <p className={styles.errorText}>{errorMsg ?? "\u00A0"}</p>
 
             <div className={styles.buttonSection}>
                 <button

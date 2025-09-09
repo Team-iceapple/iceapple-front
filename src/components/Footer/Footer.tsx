@@ -47,7 +47,7 @@ export const Footer = () => {
     useEffect(() => {
         const fetchPinnedNotices = async () => {
             try {
-                const res = await fetch(`${import.meta.env.VITE_API_BASE_URL}notice/api/mobile`);
+                const res = await fetch(`${import.meta.env.VITE_API_BASE_URL}notice/mobile`);
                 const data: { mobiles: NoticeItem[] } = await res.json();
                 const pins = data.mobiles
                     .filter((n) => n.is_pin)

@@ -22,7 +22,7 @@ export type NoticeItem = {
 };
 
 const API_BASE = import.meta.env.VITE_API_BASE_URL; // e.g. https://task-api.wisoft.io/iceapple/
-const API_URL = `${API_BASE}notice/api/sojoong`;
+const API_URL = `${API_BASE}notice/sojoong`;
 
 const chunk = <T,>(arr: T[], size: number): T[][] =>
     Array.from({ length: Math.ceil(arr.length / size) }, (_, i) =>

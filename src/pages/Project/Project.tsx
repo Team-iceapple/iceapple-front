@@ -1,13 +1,9 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import styles from './Project.module.css';
 import { Icon } from "@iconify/react";
 import { useNavigate } from "react-router-dom";
 
-type MemberType = {
-    name: string;
-    extra: string;
-};
-
+type MemberType = { name: string; extra: string; };
 type ProjectType = {
     id: string;
     name: string;
@@ -20,7 +16,7 @@ const Project = () => {
     const [projects, setProjects] = useState<ProjectType[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
-    const [selectedYear, setSelectedYear] = useState<number>(2026);
+    const [selectedYear, setSelectedYear] = useState<number | null>(null);
     const [dropdownOpen, setDropdownOpen] = useState(false);
     const navigate = useNavigate();
 
@@ -32,12 +28,26 @@ const Project = () => {
             })
             .then((data) => {
                 setProjects(data.works);
+                const ys = data.works.map((p: ProjectType) => p.year);
+                if (ys.length > 0) setSelectedYear(Math.max(...ys));
             })
             .catch(err => setError(err.message))
             .finally(() => setLoading(false));
     }, []);
 
-    const filteredProjects = projects.filter(p => p.year === selectedYear);
+    const years = useMemo(() => {
+        const set = new Set(projects.map(p => p.year));
+        return Array.from(set).sort((a, b) => b - a);
+    }, [projects]);
+
+    useEffect(() => {
+        if (years.length && (selectedYear === null || !years.includes(selectedYear))) {
+            setSelectedYear(years[0]);
+        }
+    }, [years, selectedYear]);
+
+    const filteredProjects =
+        selectedYear === null ? projects : projects.filter(p => p.year === selectedYear);
 
     if (loading) return <div className={styles.projectContainer}>로딩 중...</div>;
     if (error) return <div className={styles.projectContainer}>에러: {error}</div>;
@@ -49,16 +59,17 @@ const Project = () => {
                     <Icon icon="lucide:graduation-cap" className={styles.icon} />
                     <h1 className={styles.projectTitle}>졸업작품</h1>
                 </div>
+
                 <div className={styles.yearDropdownWrapper}>
                     <div
                         className={styles.yearDropdownToggle}
                         onClick={() => setDropdownOpen(!dropdownOpen)}
                     >
-                        {selectedYear} <Icon icon="mdi:chevron-down" />
+                        {selectedYear ?? '연도 선택'} <Icon icon="mdi:chevron-down" />
                     </div>
                     {dropdownOpen && (
                         <ul className={styles.yearDropdownMenu}>
-                            {[2026, 2027].map(year => (
+                            {years.map(year => (
                                 <li
                                     key={year}
                                     onClick={() => {
