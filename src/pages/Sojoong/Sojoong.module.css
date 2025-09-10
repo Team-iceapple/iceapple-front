@@ -1,27 +1,27 @@
-.sojoongContainer {
+.sojoong-container {
     padding: 5.5vw 2vw 2vw 3vw;
     font-family: "pretendard", sans-serif;
 }
 
-.sojoongHeader {
+.sojoong-header {
     display: flex;
     align-items: center;
     gap: 1vw;
     margin-bottom: 2vw;
 }
 
-.sojoongHeaderIcon {
+.sojoong-header-icon {
     font-size: 3.5vw;
     color: #424242;
 }
 
-.sojoongHeaderTitle {
+.sojoong-header-title {
     color: #424242;
     font-size: 2.5vw;
     font-weight: 700;
 }
 
-.sojoongContent {
+.sojoong-content {
     background-color: #fbeee7;
     display: flex;
     flex-direction: row;
@@ -34,22 +34,27 @@
     border-radius: 1.3889vw;
 }
 
-.sojoongContentId {
-    font-weight: bold;
+.pinned-title {
+    font-weight: 700;
+}
+
+.sojoong-content-id {
+    font-weight: 700;
     margin-right: 1vw;
     width: 3vw;
     text-align: center;
+    font-size: 0.7vw;
 }
 
-.sojoongPinIcon {
+.sojoong-pin-icon {
     width: 1.2153vw;
     height: 1.2153vw;
     margin-right: 1.9vw;
     margin-left: 0.8vw;
 }
 
-.sojoongContentTitle {
-    margin-top: 0.7vw;
+.sojoong-content-title {
+    margin-top: 0.5vw;
     flex-grow: 1;
     font-size: 1.2vw;
     white-space: nowrap;
@@ -57,11 +62,15 @@
     text-overflow: ellipsis;
 }
 
-.sojoongContentCreatedAt {
+.sojoong-content-created-at {
     min-width: 6vw;
     text-align: right;
 }
 
-.sojoongSlideGroup {
+.sojoong-slide-group {
     margin-bottom: 5vw;
+}
+
+.sojoong-swiper {
+    width: 100%;
 }

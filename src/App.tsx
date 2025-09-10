@@ -1,14 +1,13 @@
-import React from 'react';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import Layout from './components/Layout/Layout.tsx';
-import Home from './pages/Home/Home.tsx';
-import Project from './pages/Project/Project.tsx';
-import ProjectDetail from "./pages/Project/ProjectDetail.tsx";
-import Notice from "./pages/Notice/Notice.tsx";
-import Room from "./pages/Room/Room.tsx";
-import RoomReservation from "./pages/Room/RoomReservation.tsx";
-import Sojoong from "./pages/Sojoong/Sojoong.tsx"
-
+import React from "react";
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import Layout from "./components/Layout/Layout";
+import Home from "./pages/Home/Home";
+import Project from "./pages/Project/Project";
+import ProjectDetail from "./pages/Project/ProjectDetail";
+import Notice from "./pages/Notice/Notice";
+import Room from "./pages/Room/Room";
+import RoomReservation from "./pages/Room/RoomReservation";
+import Sojoong from "./pages/Sojoong/Sojoong";
 
 const App: React.FC = () => {
     return (
@@ -16,10 +15,11 @@ const App: React.FC = () => {
             <Layout>
                 <Routes>
                     <Route path="/" element={<Home />} />
+
                     <Route path="/notice" element={<Notice />} />
                     <Route path="/notice/:id" element={<Notice />} />
                     <Route path="/sojoong" element={<Sojoong />} />
-                    <Route path="/sojoong:id" element={<Sojoong />} />
+                    <Route path="/sojoong/:id" element={<Sojoong />} />
                     <Route path="/works" element={<Project />} />
                     <Route path="/works/:workid" element={<ProjectDetail />} />
                     <Route path="/rooms" element={<Room />} />
@@ -29,6 +29,5 @@ const App: React.FC = () => {
         </Router>
     );
 };
-
 
 export default App;

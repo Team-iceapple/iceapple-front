@@ -21,7 +21,7 @@ export type NoticeItem = {
     postNumber?: number;
 };
 
-const API_BASE = import.meta.env.VITE_API_BASE_URL; // e.g. https://task-api.wisoft.io/iceapple/
+const API_BASE = import.meta.env.VITE_API_BASE_URL;
 const API_URL = `${API_BASE}notice/sojoong`;
 
 const chunk = <T,>(arr: T[], size: number): T[][] =>
@@ -76,46 +76,52 @@ const Sojoong = () => {
     const numberedChunks = chunk(numberedNotices, 6);
 
     return (
-        <div data-scope="sojoong-page" className={styles.sojoongContainer}>
-            <div className={styles.sojoongHeader}>
-                <Icon icon="lucide:megaphone" className={styles.sojoongHeaderIcon} />
-                <h1 className={styles.sojoongHeaderTitle}>공지사항</h1>
+        <div data-scope="sojoong-page" className={styles["sojoong-container"]}>
+            <div className={styles["sojoong-header"]}>
+                <Icon icon="lucide:megaphone" className={styles["sojoong-header-icon"]} />
+                <h1 className={styles["sojoong-header-title"]}>공지사항</h1>
             </div>
 
             <Swiper
                 slidesPerView={1}
                 pagination={{ clickable: true }}
                 modules={[Pagination]}
-                className={styles.sojoongSwiper}
+                className={styles["sojoong-swiper"]}
             >
                 {numberedChunks.map((group, index) => (
                     <SwiperSlide key={index}>
-                        <div className={styles.sojoongSlideGroup}>
+                        <div className={styles["sojoong-slide-group"]}>
                             {group.map((notice) => (
                                 <div
                                     key={notice.id}
-                                    className={styles.sojoongContent}
+                                    className={styles["sojoong-content"]}
                                     onClick={() => handleClick(notice.id)}
                                 >
                                     {notice.is_pin ? (
                                         <img
                                             src={NoticePinIcon}
                                             alt="공지 고정 아이콘"
-                                            className={styles.sojoongPinIcon}
+                                            className={styles["sojoong-pin-icon"]}
                                         />
                                     ) : (
-                                        <div className={styles.sojoongContentId}>
+                                        <div className={styles["sojoong-content-id"]}>
                                             {notice.postNumber}
                                         </div>
                                     )}
+
                                     <div>
-                                        <p className={styles.sojoongContentTitle}>
+                                        <p
+                                            className={`${styles["sojoong-content-title"]} ${
+                                                notice.is_pin ? styles["pinned-title"] : ""
+                                            }`}
+                                        >
                                             {notice.title?.length > 75
                                                 ? `${notice.title.slice(0, 70)}...`
                                                 : notice.title}
                                         </p>
                                     </div>
-                                    <div className={styles.sojoongContentCreatedAt}>
+
+                                    <div className={styles["sojoong-content-created-at"]}>
                                         {notice.createdAt}
                                     </div>
                                 </div>
