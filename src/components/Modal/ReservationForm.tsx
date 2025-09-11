@@ -199,6 +199,7 @@ const ReservationForm = ({ date, selectedTimes, roomName, roomId }: Props) => {
                             value={phone}
                             setValue={(v) => setPhone(v.replace(/\D/g, "").slice(0, 11))}
                             maxLength={11}
+                            variant="phone"
                         />
                     </div>
                 )}

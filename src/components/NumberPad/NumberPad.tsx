@@ -1,4 +1,16 @@
+import { useEffect, useRef } from "react";
 import styles from "./NumberPad.module.css";
+
+type Props = {
+    value: string;
+    setValue: (val: string) => void;
+    maxLength?: number;
+    className?: string;
+    style?: React.CSSProperties;
+    onClose?: () => void;
+    onSubmit?: (val: string) => void;
+    variant?: "default" | "phone";
+};
 
 export default function NumberPad({
                                       value,
@@ -7,38 +19,62 @@ export default function NumberPad({
                                       className,
                                       style,
                                       onClose,
-                                  }: {
-    value: string;
-    setValue: (val: string) => void;
-    maxLength?: number;
-    className?: string;
-    style?: React.CSSProperties;
-    onClose?: () => void;
-}) {
-    const handleClick = (num: string) => {
-        if (value.length < maxLength) setValue(value + num);
+                                      onSubmit,
+                                      variant = "default",
+                                  }: Props) {
+    const holdTimer = useRef<number | null>(null);
+    const repeatTimer = useRef<number | null>(null);
+
+    const keys =
+        variant === "phone"
+            ? ["1", "2", "3", "4", "5", "6", "7", "8", "9", "010", "0", "⌫"]
+            : ["1", "2", "3", "4", "5", "6", "7", "8", "9", "", "0", "⌫"];
+
+    const handleClick = (k: string) => {
+        if (!k || k === "⌫" || k === "⏎" || k === "✕") return;
+        const next = value + k;
+        if (next.length <= maxLength) setValue(next);
+        if (next.length === maxLength && onSubmit) onSubmit(next);
     };
 
-    const handleBackspace = () => setValue(value.slice(0, -1));
+    const handleBackspaceOnce = () => setValue(value.slice(0, -1));
 
-    const keys = [
-        "1", "2", "3",
-        "4", "5", "6",
-        "7", "8", "9",
-        "", "0", "⌫"
-    ];
+    const startBackspaceHold = () => {
+        handleBackspaceOnce();
+        holdTimer.current = window.setTimeout(() => {
+            repeatTimer.current = window.setInterval(() => {
+                setValue((v) => v.slice(0, -1));
+            }, 60);
+        }, 350);
+    };
+
+    const stopBackspaceHold = () => {
+        if (holdTimer.current) {
+            clearTimeout(holdTimer.current);
+            holdTimer.current = null;
+        }
+        if (repeatTimer.current) {
+            clearInterval(repeatTimer.current);
+            repeatTimer.current = null;
+        }
+    };
+
+    useEffect(() => {
+        return () => stopBackspaceHold();
+    }, []);
 
     return (
         <div className={`${styles.padContainer} ${className ?? ""}`} style={style}>
             <div className={styles.padGrid}>
                 {keys.map((k, i) => {
-                    if (k === "✕") {
+                    if (k === "✕" && onClose) {
                         return (
                             <button
                                 key={`close-${i}`}
                                 className={`${styles.padBtn} ${styles.closeBtn}`}
-                                onClick={() => onClose?.()}
+                                onClick={onClose}
                                 aria-label="닫기"
+                                draggable={false}
                             >
                                 ✕
                             </button>
@@ -49,8 +85,14 @@ export default function NumberPad({
                             <button
                                 key={`backspace-${i}`}
                                 className={`${styles.padBtn} ${styles.backspace}`}
-                                onClick={handleBackspace}
+                                onClick={handleBackspaceOnce}
+                                onMouseDown={startBackspaceHold}
+                                onMouseUp={stopBackspaceHold}
+                                onMouseLeave={stopBackspaceHold}
+                                onTouchStart={startBackspaceHold}
+                                onTouchEnd={stopBackspaceHold}
                                 aria-label="지우기"
+                                draggable={false}
                             >
                                 ⌫
                             </button>
@@ -58,10 +100,12 @@ export default function NumberPad({
                     }
                     return (
                         <button
-                            key={`num-${k}-${i}`}
+                            key={`num-${k || "blank"}-${i}`}
                             className={styles.padBtn}
                             onClick={() => handleClick(k)}
-                            aria-label={`입력 ${k}`}
+                            aria-label={k ? `입력 ${k}` : "빈칸"}
+                            disabled={!k}
+                            draggable={false}
                         >
                             {k}
                         </button>
