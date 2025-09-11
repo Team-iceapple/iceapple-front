@@ -104,7 +104,6 @@ const NoticeDetail = ({ id, onClose }: Props) => {
         if (!container) return;
 
         const originalWindowOpen = window.open;
-        // @ts-ignore
         window.open = (...args: any[]) => null;
         const blockNav = (e: BeforeUnloadEvent) => {
             e.preventDefault();

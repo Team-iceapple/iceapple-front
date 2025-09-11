@@ -65,7 +65,7 @@ export const Footer = () => {
             setCurrentNoticeIndex((prev) =>
                 pinnedNotices.length > 0 ? (prev + 1) % pinnedNotices.length : 0
             );
-        }, 10000);
+        }, 2000);
         return () => clearInterval(interval);
     }, [pinnedNotices]);
 

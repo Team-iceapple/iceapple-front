@@ -16,7 +16,7 @@ type VideoItem = {
     title?: string;
     current?: boolean;
     filePath?: string;
-    fileUrl?: string; // "/media/v_xxx.mp4"
+    fileUrl?: string;
 };
 
 function buildMediaUrl(fileUrl: string) {
@@ -44,21 +44,15 @@ const Home = () => {
     const [videoUrls, setVideoUrls] = useState<string[]>([]);
     const [activeIndex, setActiveIndex] = useState(0);
     const [autoplayFailed, setAutoplayFailed] = useState(false);
-    const [rate, setRate] = useState<number>(() => {
-        const saved = localStorage.getItem("home.videoRate");
-        return saved ? Number(saved) : 1.3;
-    });
 
-    // 비디오 엘리먼트 레퍼런스(슬라이드별)
     const videoRefs = useRef<(HTMLVideoElement | null)[]>([]);
 
-    // 목록 우선 → 폴백(current)
     useEffect(() => {
         let abort = false;
 
         const listEndpoints = [
-            `${ORIGIN}${BASE_PATH}/home/videos`,        // 목록
-            `${ORIGIN}${BASE_PATH}/home/videos/current` // 폴백
+            `${ORIGIN}${BASE_PATH}/home/videos`,
+            `${ORIGIN}${BASE_PATH}/home/videos/current`
         ];
 
         (async () => {
@@ -66,12 +60,10 @@ const Home = () => {
                 let urls: string[] = [];
                 let lastErr: any = null;
 
-                // 1) 목록 시도
                 try {
                     const res = await fetch(listEndpoints[0], { headers: { Accept: "application/json" } });
                     if (res.ok) {
                         const data = await res.json();
-                        // 응답이 배열 또는 {items:[...]} 형태 어느 쪽이든 처리
                         const arr: VideoItem[] = Array.isArray(data) ? data : (data?.items ?? []);
                         urls = (arr || [])
                             .map((it) => buildMediaUrl(String(it?.fileUrl || it?.filePath || "")))
@@ -84,7 +76,6 @@ const Home = () => {
                     lastErr = e;
                 }
 
-                // 2) 목록이 비어있으면 current 폴백
                 if (urls.length === 0) {
                     try {
                         const res = await fetch(listEndpoints[1], { headers: { Accept: "application/json" } });
@@ -127,31 +118,26 @@ const Home = () => {
         };
     }, []);
 
-    // 배속은 모든 비디오에 적용(활성 슬라이드 우선)
-    useEffect(() => {
-        videoRefs.current.forEach((el) => {
-            if (el) el.playbackRate = rate;
-        });
-    }, [rate, videoUrls]);
-
-    // 활성 슬라이드 자동재생 / 비활성 슬라이드 일시정지
     useEffect(() => {
         if (!videoUrls.length) return;
 
-        // 모두 정지
         videoRefs.current.forEach((el, i) => {
             if (el && i !== activeIndex) {
-                try { el.pause(); } catch {}
+                try {
+                    el.pause();
+                } catch {}
             }
         });
 
-        // 활성 인덱스 재생 시도
         const v = videoRefs.current[activeIndex];
         if (v) {
             v.muted = true;
+
+            // 숫자로 소리 설정
+            v.volume = 0;
+
             (v as any).playsInline = true;
             v.autoplay = true;
-            v.playbackRate = rate;
 
             (async () => {
                 try {
@@ -160,19 +146,18 @@ const Home = () => {
                 } catch {
                     const onMeta = async () => {
                         v.removeEventListener("loadedmetadata", onMeta);
-                        try { await v.play(); setAutoplayFailed(false); } catch { setAutoplayFailed(true); }
+                        try {
+                            await v.play();
+                            setAutoplayFailed(false);
+                        } catch {
+                            setAutoplayFailed(true);
+                        }
                     };
                     v.addEventListener("loadedmetadata", onMeta);
                 }
             })();
         }
-    }, [activeIndex, videoUrls, rate]);
-
-    const setSpeed = (next: number) => {
-        setRate(next);
-        localStorage.setItem("home.videoRate", String(next));
-        videoRefs.current.forEach((el) => { if (el) el.playbackRate = next; });
-    };
+    }, [activeIndex, videoUrls]);
 
     const handleSlideChange = (swiper: any) => {
         setActiveIndex(swiper.realIndex ?? swiper.activeIndex ?? 0);
@@ -196,7 +181,6 @@ const Home = () => {
                                         ref={(el) => (videoRefs.current[idx] = el)}
                                         src={src}
                                         autoPlay={idx === activeIndex}
-                                        muted
                                         loop
                                         playsInline
                                         preload="auto"
@@ -204,9 +188,8 @@ const Home = () => {
                                         crossOrigin="anonymous"
                                         onLoadedMetadata={() => {
                                             const v = videoRefs.current[idx];
-                                            if (v) {
-                                                v.playbackRate = rate;
-                                                if (idx === activeIndex) v.play().catch(() => setAutoplayFailed(true));
+                                            if (v && idx === activeIndex) {
+                                                v.play().catch(() => setAutoplayFailed(true));
                                             }
                                         }}
                                         onError={() => {
@@ -217,30 +200,6 @@ const Home = () => {
                                 </SwiperSlide>
                             ))}
                         </Swiper>
-
-                        <div className={styles.controls}>
-                            <label className={styles.rateLabel}>속도 {rate.toFixed(2)}x</label>
-                            <input
-                                type="range"
-                                min={0.25}
-                                max={2}
-                                step={0.05}
-                                value={rate}
-                                onChange={(e) => setSpeed(Number(e.target.value))}
-                                className={styles.rateSlider}
-                            />
-                            <div className={styles.rateButtons}>
-                                {[0.5, 1, 1.25, 1.5, 2].map((r) => (
-                                    <button
-                                        key={r}
-                                        onClick={() => setSpeed(r)}
-                                        className={`${styles.rateBtn} ${Math.abs(rate - r) < 0.001 ? styles.active : ""}`}
-                                    >
-                                        {r}x
-                                    </button>
-                                ))}
-                            </div>
-                        </div>
 
                         {autoplayFailed && (
                             <button

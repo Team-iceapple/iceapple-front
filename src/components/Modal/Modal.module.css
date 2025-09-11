@@ -150,7 +150,6 @@
     font-size: 1vw;
 }
 
-/*입력창*/
 .inputGroup {
     display: flex;
     flex-direction: column;
