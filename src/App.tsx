@@ -1,4 +1,4 @@
-import React from "react";
+import React, {useEffect} from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Layout from "./components/Layout/Layout";
 import Home from "./pages/Home/Home";
@@ -10,6 +10,18 @@ import RoomReservation from "./pages/Room/RoomReservation";
 import Sojoong from "./pages/Sojoong/Sojoong";
 
 const App: React.FC = () => {
+
+    useEffect(() => {
+        const blockDrag = (e: Event) => e.preventDefault();
+        document.addEventListener("dragstart", blockDrag, { passive: false });
+        document.addEventListener("drop", blockDrag, { passive: false });
+        return () => {
+            document.removeEventListener("dragstart", blockDrag);
+            document.removeEventListener("drop", blockDrag);
+        };
+    }, []);
+
+
     return (
         <Router>
             <Layout>
