@@ -82,14 +82,14 @@ const LoginForm = ({
             <div className={styles.inputGroup}>
                 <input
                     className={`${styles.input} ${currentInput === "studentId" ? styles.inputActive : ""}`}
-                    placeholder="학번 (8자리)"
+                    placeholder="  학번 (8자리)"
                     value={studentId}
                     onFocus={() => setCurrentInput("studentId")}
                     readOnly
                 />
                 <input
                     className={`${styles.input} ${currentInput === "password" ? styles.inputActive : ""}`}
-                    placeholder="간편 비밀번호 4자리"
+                    placeholder="  간편 비밀번호 4자리"
                     type="password"
                     value={password}
                     onFocus={() => setCurrentInput("password")}

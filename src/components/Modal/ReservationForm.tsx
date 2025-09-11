@@ -158,7 +158,7 @@ const ReservationForm = ({ date, selectedTimes, roomName, roomId }: Props) => {
                         className={`${styles.input} ${
                             currentInput === "studentId" ? styles.inputActive : ""
                         }`}
-                        placeholder="학번 (8자리)"
+                        placeholder="  학번 (8자리)"
                         value={studentId}
                         readOnly
                         onFocus={() => setCurrentInput("studentId")}
@@ -167,7 +167,7 @@ const ReservationForm = ({ date, selectedTimes, roomName, roomId }: Props) => {
                         className={`${styles.input} ${
                             currentInput === "phone" ? styles.inputActive : ""
                         }`}
-                        placeholder="전화번호 (하이픈 없이 11자리)"
+                        placeholder="  전화번호 (하이픈 없이 11자리)"
                         value={phone}
                         readOnly
                         onFocus={() => setCurrentInput("phone")}
@@ -176,7 +176,7 @@ const ReservationForm = ({ date, selectedTimes, roomName, roomId }: Props) => {
                         className={`${styles.input} ${
                             currentInput === "password" ? styles.inputActive : ""
                         }`}
-                        placeholder="간편비밀번호 4자리"
+                        placeholder="  간편비밀번호 4자리"
                         type="password"
                         value={password}
                         readOnly
