@@ -67,39 +67,39 @@ html, body, #root {
 }
 
 .today-tile {
-    color: #4399b5b2 !important;
+    color: #4378b5 !important;
     font-weight: 700;
     position: relative;
 }
 
 .today-label {
     font-size: 0.6rem;
-    color: #4399b5b2;
+    font-weight: 300;
+    color: #4378b5;
     margin-top: 2px;
 }
 
-/* 오늘이면서 선택된 경우에는 베이지 동그라미가 보이도록 */
+
 .react-calendar__tile--now.react-calendar__tile--active {
     background: #d6b59fb2 !important;
     border-radius: 0;
 }
 
-/* 드래그/선택 방지 (스크롤은 유지) */
+
 html, body {
     height: 100%;
     -webkit-user-select: none;
     user-select: none;
-    touch-action: pan-y; /* 세로 스크롤은 허용 */
+    touch-action: pan-y;
 }
 
-/* 이미지/비디오/링크 썸네일 드래그 방지 */
+
 img, video, a, svg, canvas {
     -webkit-user-drag: none;
     user-drag: none;
-    pointer-events: auto; /* 클릭은 정상 동작 */
+    pointer-events: auto;
 }
 
-/* 입력 영역에서는 선택/드래그 허용 */
 input, textarea, select, [contenteditable="true"] {
     -webkit-user-select: text;
     user-select: text;
