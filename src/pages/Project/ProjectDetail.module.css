@@ -1,5 +1,20 @@
 .container {
-    padding: 1.8vw 2vw 2vw 5.5vw;
+    padding: 1.8vw 3vw 2vw 3vw;
+}
+
+.backButton {
+    background: none;
+    border: none;
+    cursor: pointer;
+    margin-bottom: 1rem;
+    display: inline-flex;
+    align-items: center;
+    padding: 0.25rem;
+    color: #2e86a6;
+}
+
+.backButton:hover {
+    opacity: 0.7;
 }
 
 .detailLayout {
@@ -7,19 +22,44 @@
     gap: 2vw;
     align-items: stretch;
     flex-wrap: wrap;
-    height: 77vh;
-
+    height: 70vh;
+    justify-content: center;
 }
 
 .detailTextBox {
     background-color: #f9f3ef;
     padding: 2vw;
     border-radius: 20px;
-    justify-content: space-between;
     overflow-y: auto;
     scrollbar-width: thin;
     width: 45%;
+
+    display: flex;
+    flex-direction: column;
 }
+
+.memberBlock {
+    display: block;
+    font-size: 0.95vw;
+    color: #444;
+    padding-bottom: 0;
+    margin-bottom: 0;
+    margin-top: 2rem;
+}
+
+.qrBox {
+    margin-top: auto;
+    display: flex;
+    justify-content: center;
+    padding-top: 1.2vw;
+    border-top: 1px solid #e6dfda;
+}
+
+.projectName { margin: 0; }
+.teamName   { margin: 0.5vw 0 0; }
+.detailDivider { margin: 1vw 0; }
+.detailDescription { margin: 0; }
+.memberBlock ul { margin: 0; padding-left: 1.2vw; }
 
 .detailTextBox::-webkit-scrollbar {
     width: 0.5vw;
@@ -51,26 +91,18 @@
 .detailDescription {
     font-size: 1vw;
     color: #333;
-    white-space: pre-line;
-}
 
-.memberBlock {
-    display: block;
-    gap: 2vw;
-    font-size: 0.95vw;
-    color: #444;
-    padding-bottom: 8vw;
-
+    overflow: hidden;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 5;
+    line-clamp: 5;
+    block-overflow: ellipsis;
 }
 
 .memberBlock ul {
     margin: 0;
     padding-left: 1.2vw;
-}
-
-.qrBox {
-    display: flex;
-    justify-content: center;
 }
 
 

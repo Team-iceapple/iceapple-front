@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import styles from "./NoticeDetail.module.css";
 import QRCode from "react-qr-code";
 import koglIconUrl from "../../../assets/img_opentype04.png";
@@ -66,12 +66,24 @@ function transformHtml(raw: string): string {
     return root.innerHTML;
 }
 
+const PAGE_STEP_RATIO = 0.85;
+function collectHeadings(root: HTMLElement | null): HTMLElement[] {
+    if (!root) return [];
+    return Array.from(root.querySelectorAll("h1, h2, h3, .section, [data-section='true']"))
+        .filter((el) => (el as HTMLElement).offsetParent !== null) as HTMLElement[];
+}
+
 const NoticeDetail = ({ id, onClose }: Props) => {
     const [notice, setNotice] = useState<NoticeDetailDto | null>(null);
     const [processedHtml, setProcessedHtml] = useState<string>("");
     const [error, setError] = useState<string | null>(null);
-
+    const [zoom, setZoom] = useState(1);
+    const [progress, setProgress] = useState(0);
+    const [showTop, setShowTop] = useState(false);
+    const [headings, setHeadings] = useState<HTMLElement[]>([]);
+    const holdTimer = useRef<number | null>(null);
     const apiBase = useMemo(() => import.meta.env.VITE_API_BASE_URL, []);
+    const scrollRef = useRef<HTMLDivElement | null>(null);
 
     useEffect(() => {
         const url = `${apiBase}notice/mobile/${id}`;
@@ -93,8 +105,7 @@ const NoticeDetail = ({ id, onClose }: Props) => {
                 const html = mapped.has_attachment && isEmptyHtml(mapped.content) ? "" : transformHtml(mapped.content ?? "");
                 setProcessedHtml(html);
             })
-            .catch((err) => {
-                console.error("❌ 공지 상세 불러오기 실패:", err);
+            .catch(() => {
                 setError("상세 내용을 불러오는 데 실패했습니다.");
             });
     }, [apiBase, id]);
@@ -102,26 +113,21 @@ const NoticeDetail = ({ id, onClose }: Props) => {
     useEffect(() => {
         const container = document.getElementById("notice-content");
         if (!container) return;
-
         const originalWindowOpen = window.open;
-        window.open = (...args: any[]) => null;
-        const blockNav = (e: BeforeUnloadEvent) => {
-            e.preventDefault();
-        };
+        window.open = (..._args: any[]) => null;
+        const blockNav = (e: BeforeUnloadEvent) => { e.preventDefault(); };
         window.addEventListener("beforeunload", blockNav);
-
         const styleEl = document.createElement("style");
         styleEl.textContent = `
-      #notice-content a,
-      #notice-content [role="link"] {
-        pointer-events: none !important;
-        color: gray !important;
-        text-decoration: none !important;
-        cursor: default !important;
-      }
-    `;
+            #notice-content a,
+            #notice-content [role="link"] {
+                pointer-events: none !important;
+                color: gray !important;
+                text-decoration: none !important;
+                cursor: default !important;
+            }
+        `;
         container.appendChild(styleEl);
-
         const disableOne = (el: Element) => {
             if (!(el instanceof HTMLElement)) return;
             const isAnchor = el.tagName === "A";
@@ -135,19 +141,12 @@ const NoticeDetail = ({ id, onClose }: Props) => {
             el.removeAttribute("onmouseup");
             el.setAttribute("aria-disabled", "true");
             el.setAttribute("tabindex", "-1");
-            (el as any).onclick = (e: MouseEvent) => {
-                e.preventDefault();
-                e.stopPropagation();
-                return false;
-            };
+            (el as any).onclick = (e: MouseEvent) => { e.preventDefault(); e.stopPropagation(); return false; };
         };
-
         const disableAll = (root: ParentNode) => {
             root.querySelectorAll("a, [role='link']").forEach(disableOne);
         };
-
         disableAll(container);
-
         const mo = new MutationObserver((mutations) => {
             mutations.forEach((m) => {
                 if (m.type === "childList") {
@@ -164,7 +163,6 @@ const NoticeDetail = ({ id, onClose }: Props) => {
             });
         });
         mo.observe(container, { childList: true, subtree: true, attributes: true, attributeFilter: ["href", "role", "onclick", "target"] });
-
         const captureBlocker = (e: Event) => {
             const t = e.target as HTMLElement | null;
             if (t && (t.closest("a") || t.closest("[role='link']"))) {
@@ -179,7 +177,6 @@ const NoticeDetail = ({ id, onClose }: Props) => {
         container.addEventListener("touchstart", captureBlocker, true);
         container.addEventListener("touchend", captureBlocker, true);
         container.addEventListener("contextmenu", captureBlocker, true);
-
         return () => {
             mo.disconnect();
             container.removeEventListener("click", captureBlocker, true);
@@ -195,8 +192,78 @@ const NoticeDetail = ({ id, onClose }: Props) => {
         };
     }, [processedHtml]);
 
+    useEffect(() => {
+        const el = scrollRef.current;
+        if (!el) return;
+        const onScroll = () => {
+            const max = el.scrollHeight - el.clientHeight;
+            const p = max > 0 ? (el.scrollTop / max) * 100 : 0;
+            setProgress(p);
+            setShowTop(el.scrollTop > 200);
+        };
+        el.addEventListener("scroll", onScroll, { passive: true });
+        onScroll();
+        return () => el.removeEventListener("scroll", onScroll);
+    }, [processedHtml]);
+
+    useEffect(() => {
+        const prev = document.body.style.overflow;
+        document.body.style.overflow = "hidden";
+        const onKey = (e: KeyboardEvent) => {
+            if (e.key === "Escape") onClose();
+            if (!scrollRef.current) return;
+            if (e.key === "PageDown") { e.preventDefault(); scrollByPage(1); }
+            else if (e.key === "PageUp") { e.preventDefault(); scrollByPage(-1); }
+            else if (e.key === "ArrowRight" && (e.altKey || e.metaKey || e.ctrlKey)) { e.preventDefault(); goToNextHeading(1); }
+            else if (e.key === "ArrowLeft" && (e.altKey || e.metaKey || e.ctrlKey)) { e.preventDefault(); goToNextHeading(-1); }
+        };
+        window.addEventListener("keydown", onKey);
+        return () => { document.body.style.overflow = prev; window.removeEventListener("keydown", onKey); };
+    }, [onClose]);
+
+    useEffect(() => {
+        const root = document.getElementById("notice-content");
+        setHeadings(collectHeadings(root));
+    }, [processedHtml]);
+
     const handleOverlayClick = (e: React.MouseEvent<HTMLDivElement>) => {
         if (e.currentTarget === e.target) onClose();
+    };
+
+    const scrollByPage = (dir: 1 | -1) => {
+        const el = scrollRef.current;
+        if (!el) return;
+        const delta = dir * Math.floor(el.clientHeight * PAGE_STEP_RATIO);
+        el.scrollBy({ top: delta, behavior: "smooth" });
+    };
+
+    const goToNextHeading = (dir: 1 | -1) => {
+        const el = scrollRef.current;
+        const root = document.getElementById("notice-content");
+        if (!el || !root) return;
+        const list = headings.length ? headings : collectHeadings(root);
+        if (!list.length) { scrollByPage(dir); return; }
+        const currentTop = el.scrollTop;
+        const viewportBottom = currentTop + el.clientHeight;
+        if (dir === 1) {
+            const target = list.find((h) => h.offsetTop > viewportBottom - 8);
+            if (target) el.scrollTo({ top: target.offsetTop - 8, behavior: "smooth" });
+            else el.scrollTo({ top: el.scrollHeight, behavior: "smooth" });
+        } else {
+            const prevs = list.filter((h) => h.offsetTop < currentTop - 8);
+            const target = prevs[prevs.length - 1];
+            if (target) el.scrollTo({ top: target.offsetTop - 8, behavior: "smooth" });
+            else el.scrollTo({ top: 0, behavior: "smooth" });
+        }
+    };
+
+    const startHold = (action: () => void) => {
+        action();
+        stopHold();
+        holdTimer.current = window.setInterval(action, 220);
+    };
+    const stopHold = () => {
+        if (holdTimer.current) { clearInterval(holdTimer.current); holdTimer.current = null; }
     };
 
     if (error) return <div>{error}</div>;
@@ -207,21 +274,72 @@ const NoticeDetail = ({ id, onClose }: Props) => {
     return (
         <div className={styles.modalOverlay} onClick={handleOverlayClick}>
             <div className={styles.modalContent} onClick={(e) => e.stopPropagation()}>
-                <button className={styles.backButton} onClick={onClose}>
-                    X
-                </button>
-                <h2>{notice.title}</h2>
-                {notice.createdAt && <p className={styles.createdAt}>{notice.createdAt}</p>}
-                <hr />
-                {showInline ? (
-                    <div id="notice-content" className={styles.modalNoticeContent} dangerouslySetInnerHTML={{ __html: processedHtml }} />
-                ) : (
-                    <p className={styles.modalNoticeMessage}>웹에서 확인해주세요 (첨부파일 있음)</p>
-                )}
+                <div className={styles.modalHeader}>
+                    <button className={styles.headerBtn} onClick={onClose}>닫기</button>
+                    <div className={styles.headerMain}>
+                        <h2 className={styles.title}>{notice.title}</h2>
+                        {notice.createdAt && <p className={styles.createdAt}>{notice.createdAt}</p>}
+                    </div>
+                    <div className={styles.headerTools}>
+                        <div className={styles.zoomGroup}>
+                            <button aria-label="작게" onClick={() => setZoom((z) => Math.max(0.8, +(z - 0.1).toFixed(2)))}>−</button>
+                            <span>{Math.round(zoom * 100)}%</span>
+                            <button aria-label="크게" onClick={() => setZoom((z) => Math.min(1.8, +(z + 0.1).toFixed(2)))}>+</button>
+                        </div>
+                        <div className={styles.qrMini}>
+                            <QRCode value={`${window.location.origin}/notice/${notice.id}`} size={64} />
+                        </div>
+                    </div>
+                    <div className={styles.progressTrack}>
+                        <div className={styles.progressBar} style={{ width: `${progress}%` }} />
+                    </div>
+                </div>
+
+                <div className={styles.contentArea} ref={scrollRef}>
+                    <div style={{ fontSize: `${1.5 * zoom}rem`, lineHeight: 1.6 }}>
+                        {showInline ? (
+                            <div id="notice-content" className={styles.modalNoticeContent} dangerouslySetInnerHTML={{ __html: processedHtml }} />
+                        ) : (
+                            <p className={styles.modalNoticeMessage}>웹에서 확인해주세요 (첨부파일 있음)</p>
+                        )}
+                    </div>
+                </div>
             </div>
-            <div className={styles.qrContainer} onClick={(e) => e.stopPropagation()}>
-                <p>&nbsp; 모바일에서 확인하려면 QR을 스캔하세요</p>
-                <QRCode value={`${window.location.origin}/notice/${notice.id}`} size={128} />
+
+            <div className={styles.floatDock}>
+                {showTop && (
+                    <button
+                        className={styles.scrollTopBtn}
+                        onClick={() => scrollRef.current?.scrollTo({ top: 0, behavior: "smooth" })}
+                        aria-label="맨 위로"
+                    >
+                        ↑
+                    </button>
+                )}
+                <div className={styles.manualScrollRail} aria-hidden>
+                    <button
+                        className={styles.railBtn}
+                        title="위로 한 페이지"
+                        onMouseDown={() => startHold(() => scrollByPage(-1))}
+                        onMouseUp={stopHold}
+                        onMouseLeave={stopHold}
+                        onTouchStart={() => startHold(() => scrollByPage(-1))}
+                        onTouchEnd={stopHold}
+                    >
+                        Pg↑
+                    </button>
+                    <button
+                        className={styles.railBtn}
+                        title="아래로 한 페이지"
+                        onMouseDown={() => startHold(() => scrollByPage(1))}
+                        onMouseUp={stopHold}
+                        onMouseLeave={stopHold}
+                        onTouchStart={() => startHold(() => scrollByPage(1))}
+                        onTouchEnd={stopHold}
+                    >
+                        Pg↓
+                    </button>
+                </div>
             </div>
         </div>
     );

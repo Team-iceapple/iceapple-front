@@ -1,8 +1,9 @@
 import { useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import baseStyles from './Project.module.css';
 import detailStyles from './ProjectDetail.module.css';
 import { QRCodeSVG } from 'qrcode.react';
+import { Icon } from "@iconify/react";
 
 type MemberType = {
     name: string;
@@ -22,6 +23,7 @@ type ProjectDetailType = {
 
 const ProjectDetail = () => {
     const { workid } = useParams<{ workid: string }>();
+    const navigate = useNavigate();
     const [project, setProject] = useState<ProjectDetailType | null>(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
@@ -65,8 +67,16 @@ const ProjectDetail = () => {
 
     return (
         <div className={detailStyles.container}>
-            <div className={detailStyles.detailLayout}>
+            <button
+                className={detailStyles.backButton}
+                onClick={() => navigate('/works')}
+                aria-label="뒤로가기"
+            >
+                <Icon icon="mingcute:arrow-left-fill" width="2vw" height="2vw" />
 
+            </button>
+
+            <div className={detailStyles.detailLayout}>
                 <div className={detailStyles.detailTextBox}>
                     <h1 className={detailStyles.projectName}>{project.name}</h1>
                     <p className={detailStyles.teamName}>팀명: {project.team_name}</p>
