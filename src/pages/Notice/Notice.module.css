@@ -72,3 +72,17 @@
 .notice-slide-group {
     margin-bottom: 5vw;
 }
+
+:global(.swiper-pagination-bullet) {
+    width: 0.7vw;
+    height: 0.7vw;
+    background: #4399B5;
+    opacity: 0.5;
+    margin: 0 0.9vw !important;
+}
+
+:global(.swiper-pagination-bullet-active) {
+    background: #2e86a6;
+    opacity: 1;
+    transform: scale(1.3);
+}
