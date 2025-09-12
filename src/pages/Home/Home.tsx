@@ -178,7 +178,7 @@ const Home = () => {
                             {videoUrls.map((src, idx) => (
                                 <SwiperSlide key={src + "_" + idx}>
                                     <video
-                                        ref={(el) => (videoRefs.current[idx] = el)}
+                                        ref={(el) => (()=> {videoRefs.current[idx] = el})}
                                         src={src}
                                         autoPlay={idx === activeIndex}
                                         loop

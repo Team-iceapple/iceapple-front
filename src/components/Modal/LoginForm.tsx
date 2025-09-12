@@ -2,7 +2,7 @@ import { useState } from "react";
 import styles from "./Modal.module.css";
 import logo from "/logo2.svg";
 import NumberPad from "../NumberPad/NumberPad.tsx";
-import axios, { AxiosError } from "axios";
+import axios from "axios";
 
 type Step = "login" | "loginError" | "reservationList";
 

@@ -40,12 +40,15 @@ export default function NumberPad({
     const handleBackspaceOnce = () => setValue(value.slice(0, -1));
 
     const startBackspaceHold = () => {
-        handleBackspaceOnce();
-        holdTimer.current = window.setTimeout(() => {
-            repeatTimer.current = window.setInterval(() => {
-                setValue((v) => v.slice(0, -1));
-            }, 60);
-        }, 350);
+        // handleBackspaceOnce();
+        // holdTimer.current = window.setTimeout(() => {
+        //     repeatTimer.current = window.setInterval(() => {
+        //         setValue((v) => {
+        //             console.info(`hi ${v}`);
+        //             console.info(typeof v);
+        //             v.slice(0, -1)});
+        //     }, 60);
+        // }, 350);
     };
 
     const stopBackspaceHold = () => {

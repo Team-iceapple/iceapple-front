@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import {type ChangeEvent, useEffect, useMemo, useRef, useState} from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import Calendar from "react-calendar";
 import "react-calendar/dist/Calendar.css";
@@ -60,7 +60,7 @@ const RoomReservation = () => {
     };
 
     const notifyAboveElement = (
-        e: React.MouseEvent<HTMLInputElement, MouseEvent>,
+        e : React.MouseEvent<HTMLInputElement, MouseEvent>|ChangeEvent<HTMLInputElement>,
         msg: string
     ) => {
         const el = e.currentTarget as HTMLElement;

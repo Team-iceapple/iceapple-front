@@ -11,11 +11,11 @@ const Sidebar = () => {
     const groupRef = useRef(null);
 
     useEffect(() => {
-        const onClickOutside = (e) => {
+        const onClickOutside = () => {
             if (!groupRef.current) return;
-            if (!groupRef.current.contains(e.target)) {
-                setOpenNotice(false);
-            }
+            // if (!groupRef.current.contains(e.target)) {
+            //     setOpenNotice(false);
+            // }
         };
         const onKey = (e) => {
             if (e.key === 'Escape') setOpenNotice(false);
