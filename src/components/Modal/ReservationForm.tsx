@@ -43,6 +43,11 @@ const ReservationForm = ({ date, selectedTimes, roomName, roomId }: Props) => {
     const [showError, setShowError] = useState<string | null>(null);
     const [isConfirmed, setIsConfirmed] = useState(false);
 
+    const sortedSelectedTimes = useMemo(() => {
+        const unique = Array.from(new Set(selectedTimes)); // 중복 제거(있다면)
+        return unique.sort((a, b) => timeToHour(a) - timeToHour(b));
+    }, [selectedTimes]);
+
     const formattedDate = useMemo(
         () =>
             new Intl.DateTimeFormat("ko-KR", {
@@ -111,7 +116,7 @@ const ReservationForm = ({ date, selectedTimes, roomName, roomId }: Props) => {
                 <div className={styles.confirmationDetails}>
                     <strong>{formattedDate}</strong>
 
-                    {selectedTimes.map((time, i) => (
+                    {sortedSelectedTimes.map((time, i) => (
                         <div key={i} className={styles.timeRow}>
                             {time}
                         </div>
@@ -135,7 +140,7 @@ const ReservationForm = ({ date, selectedTimes, roomName, roomId }: Props) => {
                 </div>
 
                 <div className={styles.timeColumn}>
-                    {selectedTimes.map((time, index) => (
+                    {sortedSelectedTimes.map((time, index) => (
                         <div key={index} className={styles.timeText}>
                             {time}
                         </div>
@@ -143,7 +148,7 @@ const ReservationForm = ({ date, selectedTimes, roomName, roomId }: Props) => {
                 </div>
 
                 <div className={styles.roomColumn}>
-                    {selectedTimes.map((_, index) => (
+                    {sortedSelectedTimes.map((_, index) => (
                         <div key={index} className={styles.roomText}>
                             {index === 0 ? roomName : ""}
                         </div>
@@ -152,7 +157,6 @@ const ReservationForm = ({ date, selectedTimes, roomName, roomId }: Props) => {
             </div>
 
             <div style={{ width: "100%" }}>
-                {/* ▼ 숫자패드 기준점 */}
                 <div className={styles.inputGroup}>
                     <input
                         className={`${styles.input} ${

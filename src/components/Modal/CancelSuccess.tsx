@@ -28,17 +28,19 @@ const CancelSuccess = ({
         <div className={styles.confirmationBox}>
             <div className={styles.confirmationId}>{studentId} 님의</div>
 
-            {hasItems ? (
-                cancelledReservations.map((res, idx) => (
-                    <div key={idx} className={styles.confirmationDetails}>
-                        <div>{toKoreanDate(res.date)}</div>
-                        <div>{res.times.join(", ")}</div>
-                        <div>{res.room}</div>
-                    </div>
-                ))
-            ) : (
-                <div className={styles.confirmationDetails}>취소된 예약이 없습니다.</div>
-            )}
+            <div className={styles.cancelList}>
+                {hasItems ? (
+                    cancelledReservations.map((res, idx) => (
+                        <div key={idx} className={styles.confirmationDetails}>
+                            <div>{toKoreanDate(res.date)}</div>
+                            <div>{res.times.join(", ")}</div>
+                            <div>{res.room}</div>
+                        </div>
+                    ))
+                ) : (
+                    <div className={styles.confirmationDetails}>취소된 예약이 없습니다.</div>
+                )}
+            </div>
 
             <div className={styles.confirmationSuccess}>예약이 취소되었습니다.</div>
         </div>

@@ -1,4 +1,4 @@
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState } from "react";
 import styles from "./Modal.module.css";
 import { Icon } from "@iconify/react";
 import LoginForm from "./LoginForm";
@@ -43,15 +43,8 @@ const Modal = ({
         };
     }, [onClose]);
 
-    const handleBackdropClick = useCallback(
-        (e: React.MouseEvent<HTMLDivElement>) => {
-            if (e.target === e.currentTarget) onClose();
-        },
-        [onClose]
-    );
-
     return (
-        <div className={styles.backdrop} onClick={handleBackdropClick} role="dialog" aria-modal="true">
+        <div className={styles.backdrop} role="dialog" aria-modal="true">
             <div className={styles.modal} onClick={(e) => e.stopPropagation()}>
                 <button className={styles.closeBtn} onClick={onClose} aria-label="닫기">
                     <Icon icon="mdi:close" style={{ width: "1.6vw", height: "1.6vw" }} />
