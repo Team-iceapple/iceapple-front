@@ -33,6 +33,18 @@
     margin-bottom: 3vw;
 }
 
+.roomFrame {
+    position: relative;
+    display: flex;
+    justify-content: center;
+}
+
+.arrowFix {
+    position: absolute;
+    top: 65% !important;
+}
+
+
 .roomDesc {
     white-space: pre-wrap;
     color: #333;

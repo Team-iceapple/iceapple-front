@@ -29,7 +29,6 @@
     align-items: center;
     width: 58.4167vw;
     height: 3.5417vw;
-    margin-left: 7vw;
     margin-top: 1.0vw;
     padding: 0 0 0 1vw;
     border-radius: 1.3889vw;
@@ -71,6 +70,9 @@
 
 .notice-slide-group {
     margin-bottom: 5vw;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
 }
 
 .notice-swiper-frame {
@@ -113,13 +115,9 @@
     background: rgba(66, 66, 66, 1);
 }
 
-.navLeft {
-    left: calc(3vw - 2.6vw);
-}
+.navLeft { left: 2.5vw; }
+.navRight { right: 2.5vw; }
 
-.navRight {
-    left: calc(9vw + 58.4167vw + 1.2vw);
-}
 
 .navArrow :global(svg) {
     width: 1.4vw;

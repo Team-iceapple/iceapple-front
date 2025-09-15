@@ -71,6 +71,23 @@ const RoomReservation = () => {
         notifyAt(msg, centerX, topY - OFFSET);
     };
 
+    const tryToggleTime = (
+        _e: React.MouseEvent<HTMLElement> | React.KeyboardEvent<HTMLElement>,
+        time: string,
+        index: number
+    ) => {
+        const reserved = availability[index] === 1;
+        const checked = selectedTime.includes(time);
+
+        if (isBlocked(checked, reserved)) {
+            notifyAt(`최대 ${MAX_SLOTS}개까지만 선택할 수 있어요.`, window.innerWidth / 2, 120);
+            return;
+        }
+        if (reserved || loadingAvail) return;
+
+        setSelectedTime(prev => (checked ? prev.filter(t => t !== time) : [...prev, time]));
+    };
+
     useEffect(() => {
         const fetchRooms = async () => {
             setLoadingRooms(true);
@@ -195,7 +212,23 @@ const RoomReservation = () => {
                                 const checked = selectedTime.includes(time);
 
                                 return (
-                                    <tr key={index} className={reservationStyles.timeRow}>
+                                    <tr
+                                        key={index}
+                                        className={reservationStyles.timeRow}
+                                        onClick={(e) => tryToggleTime(e, time, index)}
+                                        onKeyDown={(e) => {
+                                            if (e.key === "Enter" || e.key === " ") {
+                                                e.preventDefault();
+                                                tryToggleTime(e, time, index);
+                                            }
+                                        }}
+                                        tabIndex={0}
+                                        aria-checked={selectedTime.includes(time)}
+                                        role="row"
+                                        style={{
+                                            cursor: availability[index] === 1 || loadingAvail ? "not-allowed" : "pointer",
+                                        }}
+                                    >
                                         <td>
                                             <div className="form-check d-flex justify-content-center">
                                                 <input
@@ -207,20 +240,20 @@ const RoomReservation = () => {
                                                     value={time}
                                                     checked={checked}
                                                     onClick={(e) => {
+                                                        e.stopPropagation();
                                                         if (isBlocked(checked, reserved)) {
                                                             e.preventDefault();
                                                             notifyAboveElement(e, `최대 ${MAX_SLOTS}개까지만 선택할 수 있어요.`);
                                                         }
                                                     }}
                                                     onChange={(e) => {
+                                                        e.stopPropagation();
                                                         if (isBlocked(checked, reserved)) {
                                                             notifyAboveElement(e, `최대 ${MAX_SLOTS}개까지만 선택할 수 있어요.`);
                                                             return;
                                                         }
                                                         if (reserved || loadingAvail) return;
-                                                        setSelectedTime((prev) =>
-                                                            checked ? prev.filter((t) => t !== time) : [...prev, time]
-                                                        );
+                                                        setSelectedTime((prev) => (checked ? prev.filter((t) => t !== time) : [...prev, time]));
                                                     }}
                                                     disabled={reserved || loadingAvail}
                                                     aria-disabled={!checked && !canPickMore}
@@ -228,7 +261,11 @@ const RoomReservation = () => {
                                             </div>
                                         </td>
                                         <td>
-                                            <label htmlFor={`time-${index}`} className="form-check-label">
+                                            <label
+                                                htmlFor={`time-${index}`}
+                                                className="form-check-label"
+                                                onClick={(e) => e.stopPropagation()}
+                                            >
                                                 {time}
                                             </label>
                                         </td>

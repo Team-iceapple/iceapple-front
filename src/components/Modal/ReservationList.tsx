@@ -101,7 +101,7 @@ const ReservationList = ({ studentId, password, setStep, setCancelledData }: Res
 
     return (
         <>
-            <div>
+            <div className={styles.listContainer}>
                 <div className={styles.confirmationId}>{studentId} 님의 예약 내역</div>
 
                 <div className={styles.reservationList}>
@@ -133,7 +133,6 @@ const ReservationList = ({ studentId, password, setStep, setCancelledData }: Res
                         ))}
                 </div>
             </div>
-
             <div className={styles.buttonSection}>
                 <button
                     className={styles.submitBtn}
