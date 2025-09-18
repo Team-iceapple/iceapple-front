@@ -95,8 +95,7 @@
     overflow: hidden;
     display: -webkit-box;
     -webkit-box-orient: vertical;
-    -webkit-line-clamp: 5;
-    line-clamp: 5;
+    -webkit-line-clamp: 8;
     block-overflow: ellipsis;
 }
 

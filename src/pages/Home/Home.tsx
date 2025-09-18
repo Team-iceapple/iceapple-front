@@ -51,8 +51,7 @@ const Home = () => {
         let abort = false;
 
         const listEndpoints = [
-            `${ORIGIN}${BASE_PATH}/home/videos`,
-            `${ORIGIN}${BASE_PATH}/home/videos/current`
+            `${ORIGIN}${BASE_PATH}/home/videos/playlist`
         ];
 
         (async () => {
