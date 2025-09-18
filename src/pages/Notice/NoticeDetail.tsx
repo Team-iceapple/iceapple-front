@@ -11,6 +11,7 @@ type NoticeDetailDto = {
     content: string;
     createdAt: string;
     has_attachment: boolean;
+    url?: string; // ✅ API의 url 필드
 };
 
 const KOGL_TEXT = "공공누리 제4유형: 출처표시 + 상업적 이용금지 + 변경금지";
@@ -26,6 +27,7 @@ function transformHtml(raw: string): string {
     const doc = document.implementation.createHTMLDocument("notice");
     const root = doc.createElement("div");
     root.innerHTML = raw ?? "";
+
     root.querySelectorAll("img").forEach((img) => {
         img.setAttribute("loading", "lazy");
         img.classList.add(styles.responsiveImg);
@@ -50,6 +52,7 @@ function transformHtml(raw: string): string {
         wrap.appendChild(caption);
         a.replaceWith(wrap);
     });
+
     const kogl = doc.createElement("div");
     kogl.className = styles.koglBadge;
     const iconImg = doc.createElement("img");
@@ -63,6 +66,7 @@ function transformHtml(raw: string): string {
     kogl.appendChild(iconImg);
     kogl.appendChild(text);
     root.appendChild(kogl);
+
     return root.innerHTML;
 }
 
@@ -99,10 +103,14 @@ const NoticeDetail = ({ id, onClose }: Props) => {
                     content: data.content,
                     createdAt: data.createdAt || data.created_at || "",
                     has_attachment: data.has_attachment,
+                    url: data.url, // ✅ 저장
                 };
                 setNotice(mapped);
                 setError(null);
-                const html = mapped.has_attachment && isEmptyHtml(mapped.content) ? "" : transformHtml(mapped.content ?? "");
+                const html =
+                    mapped.has_attachment && isEmptyHtml(mapped.content)
+                        ? ""
+                        : transformHtml(mapped.content ?? "");
                 setProcessedHtml(html);
             })
             .catch(() => {
@@ -115,19 +123,22 @@ const NoticeDetail = ({ id, onClose }: Props) => {
         if (!container) return;
         const originalWindowOpen = window.open;
         window.open = (..._args: any[]) => null;
-        const blockNav = (e: BeforeUnloadEvent) => { e.preventDefault(); };
+        const blockNav = (e: BeforeUnloadEvent) => {
+            e.preventDefault();
+        };
         window.addEventListener("beforeunload", blockNav);
         const styleEl = document.createElement("style");
         styleEl.textContent = `
-            #notice-content a,
-            #notice-content [role="link"] {
-                pointer-events: none !important;
-                color: gray !important;
-                text-decoration: none !important;
-                cursor: default !important;
-            }
-        `;
+      #notice-content a,
+      #notice-content [role="link"] {
+        pointer-events: none !important;
+        color: gray !important;
+        text-decoration: none !important;
+        cursor: default !important;
+      }
+    `;
         container.appendChild(styleEl);
+
         const disableOne = (el: Element) => {
             if (!(el instanceof HTMLElement)) return;
             const isAnchor = el.tagName === "A";
@@ -141,12 +152,17 @@ const NoticeDetail = ({ id, onClose }: Props) => {
             el.removeAttribute("onmouseup");
             el.setAttribute("aria-disabled", "true");
             el.setAttribute("tabindex", "-1");
-            (el as any).onclick = (e: MouseEvent) => { e.preventDefault(); e.stopPropagation(); return false; };
+            (el as any).onclick = (e: MouseEvent) => {
+                e.preventDefault();
+                e.stopPropagation();
+                return false;
+            };
         };
         const disableAll = (root: ParentNode) => {
             root.querySelectorAll("a, [role='link']").forEach(disableOne);
         };
         disableAll(container);
+
         const mo = new MutationObserver((mutations) => {
             mutations.forEach((m) => {
                 if (m.type === "childList") {
@@ -156,13 +172,22 @@ const NoticeDetail = ({ id, onClose }: Props) => {
                         disableAll(node);
                     });
                 } else if (m.type === "attributes") {
-                    if (m.target instanceof HTMLElement && m.target.matches("a, [role='link']")) {
+                    if (
+                        m.target instanceof HTMLElement &&
+                        m.target.matches("a, [role='link']")
+                    ) {
                         disableOne(m.target);
                     }
                 }
             });
         });
-        mo.observe(container, { childList: true, subtree: true, attributes: true, attributeFilter: ["href", "role", "onclick", "target"] });
+        mo.observe(container, {
+            childList: true,
+            subtree: true,
+            attributes: true,
+            attributeFilter: ["href", "role", "onclick", "target"],
+        });
+
         const captureBlocker = (e: Event) => {
             const t = e.target as HTMLElement | null;
             if (t && (t.closest("a") || t.closest("[role='link']"))) {
@@ -177,6 +202,7 @@ const NoticeDetail = ({ id, onClose }: Props) => {
         container.addEventListener("touchstart", captureBlocker, true);
         container.addEventListener("touchend", captureBlocker, true);
         container.addEventListener("contextmenu", captureBlocker, true);
+
         return () => {
             mo.disconnect();
             container.removeEventListener("click", captureBlocker, true);
@@ -212,13 +238,25 @@ const NoticeDetail = ({ id, onClose }: Props) => {
         const onKey = (e: KeyboardEvent) => {
             if (e.key === "Escape") onClose();
             if (!scrollRef.current) return;
-            if (e.key === "PageDown") { e.preventDefault(); scrollByPage(1); }
-            else if (e.key === "PageUp") { e.preventDefault(); scrollByPage(-1); }
-            else if (e.key === "ArrowRight" && (e.altKey || e.metaKey || e.ctrlKey)) { e.preventDefault(); goToNextHeading(1); }
-            else if (e.key === "ArrowLeft" && (e.altKey || e.metaKey || e.ctrlKey)) { e.preventDefault(); goToNextHeading(-1); }
+            if (e.key === "PageDown") {
+                e.preventDefault();
+                scrollByPage(1);
+            } else if (e.key === "PageUp") {
+                e.preventDefault();
+                scrollByPage(-1);
+            } else if (e.key === "ArrowRight" && (e.altKey || e.metaKey || e.ctrlKey)) {
+                e.preventDefault();
+                goToNextHeading(1);
+            } else if (e.key === "ArrowLeft" && (e.altKey || e.metaKey || e.ctrlKey)) {
+                e.preventDefault();
+                goToNextHeading(-1);
+            }
         };
         window.addEventListener("keydown", onKey);
-        return () => { document.body.style.overflow = prev; window.removeEventListener("keydown", onKey); };
+        return () => {
+            document.body.style.overflow = prev;
+            window.removeEventListener("keydown", onKey);
+        };
     }, [onClose]);
 
     useEffect(() => {
@@ -242,7 +280,10 @@ const NoticeDetail = ({ id, onClose }: Props) => {
         const root = document.getElementById("notice-content");
         if (!el || !root) return;
         const list = headings.length ? headings : collectHeadings(root);
-        if (!list.length) { scrollByPage(dir); return; }
+        if (!list.length) {
+            scrollByPage(dir);
+            return;
+        }
         const currentTop = el.scrollTop;
         const viewportBottom = currentTop + el.clientHeight;
         if (dir === 1) {
@@ -263,13 +304,27 @@ const NoticeDetail = ({ id, onClose }: Props) => {
         holdTimer.current = window.setInterval(action, 220);
     };
     const stopHold = () => {
-        if (holdTimer.current) { clearInterval(holdTimer.current); holdTimer.current = null; }
+        if (holdTimer.current) {
+            clearInterval(holdTimer.current);
+            holdTimer.current = null;
+        }
     };
 
     if (error) return <div>{error}</div>;
     if (!notice) return <div />;
 
     const showInline = !(notice.has_attachment && isEmptyHtml(notice.content));
+
+    const linkUrl = (() => {
+        const raw = (notice.url ?? "").trim();
+        if (!raw) return `${window.location.origin}/notice/${notice.id}`;
+        try {
+            return new URL(raw, apiBase).toString();
+        } catch {
+            return raw;
+        }
+    })();
+
 
     return (
         <div className={styles.modalOverlay} onClick={handleOverlayClick}>
@@ -286,10 +341,20 @@ const NoticeDetail = ({ id, onClose }: Props) => {
                             <span>{Math.round(zoom * 100)}%</span>
                             <button aria-label="크게" onClick={() => setZoom((z) => Math.min(1.8, +(z + 0.1).toFixed(2)))}>+</button>
                         </div>
-                        <div className={styles.qrMini}>
-                            <QRCode value={`${window.location.origin}/notice/${notice.id}`} size={64} />
-                        </div>
+
+                        {/* ✅ QR을 클릭하면 API에서 내려준 url로 이동 */}
+                        <a
+                            href={linkUrl}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className={styles.qrMini}
+                            title="상세 원문 페이지 열기"
+                            onClick={(e) => e.stopPropagation()}
+                        >
+                            <QRCode value={linkUrl} size={64} />
+                        </a>
                     </div>
+
                     <div className={styles.progressTrack}>
                         <div className={styles.progressBar} style={{ width: `${progress}%` }} />
                     </div>
@@ -298,48 +363,52 @@ const NoticeDetail = ({ id, onClose }: Props) => {
                 <div className={styles.contentArea} ref={scrollRef}>
                     <div style={{ fontSize: `${1.5 * zoom}rem`, lineHeight: 1.6 }}>
                         {showInline ? (
-                            <div id="notice-content" className={styles.modalNoticeContent} dangerouslySetInnerHTML={{ __html: processedHtml }} />
+                            <div
+                                id="notice-content"
+                                className={styles.modalNoticeContent}
+                                dangerouslySetInnerHTML={{ __html: processedHtml }}
+                            />
                         ) : (
                             <p className={styles.modalNoticeMessage}>웹에서 확인해주세요 (첨부파일 있음)</p>
                         )}
                     </div>
                 </div>
-            </div>
 
-            <div className={styles.floatDock}>
-                {showTop && (
+                {/* ▼ (필요 시) 모달 내부 우하단 플로팅 버튼들 – 기존 그대로 사용 */}
+                <div className={styles.floatDock}>
                     <button
-                        className={styles.scrollTopBtn}
+                        className={`${styles.scrollTopBtn} ${showTop ? "" : styles.scrollTopBtnHidden}`}
                         onClick={() => scrollRef.current?.scrollTo({ top: 0, behavior: "smooth" })}
                         aria-label="맨 위로"
                     >
-                        ↑
+                        Top
                     </button>
-                )}
-                <div className={styles.manualScrollRail} aria-hidden>
-                    <button
-                        className={styles.railBtn}
-                        title="위로 한 페이지"
-                        onMouseDown={() => startHold(() => scrollByPage(-1))}
-                        onMouseUp={stopHold}
-                        onMouseLeave={stopHold}
-                        onTouchStart={() => startHold(() => scrollByPage(-1))}
-                        onTouchEnd={stopHold}
-                    >
-                        Pg↑
-                    </button>
-                    <button
-                        className={styles.railBtn}
-                        title="아래로 한 페이지"
-                        onMouseDown={() => startHold(() => scrollByPage(1))}
-                        onMouseUp={stopHold}
-                        onMouseLeave={stopHold}
-                        onTouchStart={() => startHold(() => scrollByPage(1))}
-                        onTouchEnd={stopHold}
-                    >
-                        Pg↓
-                    </button>
+                    <div className={styles.manualScrollRail} aria-hidden>
+                        <button
+                            className={styles.railBtn}
+                            title="위로 한 페이지"
+                            onMouseDown={() => startHold(() => scrollByPage(-1))}
+                            onMouseUp={stopHold}
+                            onMouseLeave={stopHold}
+                            onTouchStart={() => startHold(() => scrollByPage(-1))}
+                            onTouchEnd={stopHold}
+                        >
+                            Pg↑
+                        </button>
+                        <button
+                            className={styles.railBtn}
+                            title="아래로 한 페이지"
+                            onMouseDown={() => startHold(() => scrollByPage(1))}
+                            onMouseUp={stopHold}
+                            onMouseLeave={stopHold}
+                            onTouchStart={() => startHold(() => scrollByPage(1))}
+                            onTouchEnd={stopHold}
+                        >
+                            Pg↓
+                        </button>
+                    </div>
                 </div>
+                {/* ▲ */}
             </div>
         </div>
     );
