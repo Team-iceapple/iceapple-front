@@ -4,6 +4,37 @@
     align-items: flex-start;
     margin: 0 4vw 0 4vw;
 }
+.buttonGroup {
+    display: grid;
+    grid-template-columns: 1vw 20vw 1vw;
+    align-items: center;
+}
+
+.roomWindow {
+    display: flex;
+    justify-content: center;
+    gap: 0.4vw;
+    overflow: hidden;
+    max-width: 100%;
+}
+
+.arrowBtn {
+    background: transparent;
+    border: none;
+    font-size: 1vw;
+    font-weight: 700;
+    width: auto;
+    height: auto;
+    padding: 4px 8px;
+    cursor: pointer;
+    color: #333;
+}
+
+.arrowBtn:disabled {
+    opacity: 0.3;
+    cursor: not-allowed;
+}
+
 
 .Button {
     height: 2.6vw;
@@ -25,14 +56,6 @@
 
 .activeButton {
     background-color: #d6b59fb2;
-}
-
-.buttonGroup {
-    display: flex;
-    gap: 0.5vw;
-    margin-top: 2vw;
-    margin-bottom: 2vw;
-    margin-left: 0.5vw;
 }
 
 .leftColumn {

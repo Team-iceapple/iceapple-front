@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import styles from "./Modal.module.css";
 import axios from "axios";
 
@@ -17,7 +17,7 @@ interface ReservationListProps {
     studentId: string;
     password: string;
     setStep: (s: "login" | "loginError" | "reservationList" | "CancelSuccess") => void;
-    setCancelledData: (data: CancelledItem[]) => void; // CancelSuccess와 동일 타입
+    setCancelledData: (data: CancelledItem[]) => void;
 }
 
 const ReservationList = ({ studentId, password, setStep, setCancelledData }: ReservationListProps) => {
@@ -26,20 +26,16 @@ const ReservationList = ({ studentId, password, setStep, setCancelledData }: Res
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
 
-
-    // 예약 목록 조회
     useEffect(() => {
         const fetchReservations = async () => {
             if (!studentId || !password) return;
             try {
                 setLoading(true);
                 setError(null);
-
                 const res = await axios.post(`${API_BASE_URL}/reservations/reservation-info`, {
                     student_number: studentId,
                     password,
                 });
-
                 setReservations(Array.isArray(res.data) ? res.data : []);
             } catch (e) {
                 console.error(e);
@@ -48,7 +44,6 @@ const ReservationList = ({ studentId, password, setStep, setCancelledData }: Res
                 setLoading(false);
             }
         };
-
         fetchReservations();
     }, [studentId, password]);
 
@@ -58,13 +53,33 @@ const ReservationList = ({ studentId, password, setStep, setCancelledData }: Res
     const fmtTime = (h: number) => `${String(h).padStart(2, "0")}:00`;
     const fmtDateISO = (iso: string) => iso.split("T")[0];
 
+    const visibleReservations = useMemo(() => {
+        const now = new Date();
+        const isFuture = (r: Reservation) => {
+            const datePart = fmtDateISO(r.date);
+            if (!r.times || r.times.length === 0) return false;
+            return r.times.some((h) => {
+                const hh = String(h).padStart(2, "0");
+                const dt = new Date(`${datePart}T${hh}:00:00`);
+                return dt.getTime() > now.getTime();
+            });
+        };
+        return reservations.filter(isFuture).sort((a, b) => {
+            const aDate = fmtDateISO(a.date);
+            const bDate = fmtDateISO(b.date);
+            const aMin = Math.min(...a.times);
+            const bMin = Math.min(...b.times);
+            const aTs = new Date(`${aDate}T${String(aMin).padStart(2, "0")}:00:00`).getTime();
+            const bTs = new Date(`${bDate}T${String(bMin).padStart(2, "0")}:00:00`).getTime();
+            return aTs - bTs;
+        });
+    }, [reservations]);
+
     const handleCancel = async () => {
         if (selectedIds.length === 0) return;
-
         try {
             setLoading(true);
             setError(null);
-
             const cancelledForUI = reservations
                 .filter(r => selectedIds.includes(r.id))
                 .map(r => ({
@@ -72,7 +87,6 @@ const ReservationList = ({ studentId, password, setStep, setCancelledData }: Res
                     times: (r.times ?? []).map(fmtTime),
                     room: r.place?.name ?? "",
                 }));
-
             await axios.delete(`${API_BASE_URL}/reservations`, {
                 data: {
                     reservation_id: selectedIds,
@@ -82,7 +96,6 @@ const ReservationList = ({ studentId, password, setStep, setCancelledData }: Res
                     Accept: "application/json",
                 },
             });
-
             setCancelledData(cancelledForUI);
             setReservations(prev => prev.filter(r => !selectedIds.includes(r.id)));
             setSelectedIds([]);
@@ -107,12 +120,12 @@ const ReservationList = ({ studentId, password, setStep, setCancelledData }: Res
                 <div className={styles.reservationList}>
                     {loading && <div className={styles.empty}>불러오는 중…</div>}
 
-                    {!loading && reservations.length === 0 && !error && (
+                    {!loading && visibleReservations.length === 0 && !error && (
                         <div className={styles.empty}>예약 내역이 없습니다.</div>
                     )}
 
                     {!loading &&
-                        reservations.map((res) => (
+                        visibleReservations.map((res) => (
                             <label key={res.id}>
                                 <div className={styles.reservationInfo}>
                                     <input
