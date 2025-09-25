@@ -63,9 +63,20 @@ const LoginForm = ({
             }
         } catch (e: any) {
             const code = e?.response?.status;
-            if (code === 401) setErrorMsg("학번 또는 비밀번호가 올바르지 않습니다.");
-            else if (code === 404) setErrorMsg("학번 또는 비밀번호가 올바르지 않습니다.");
+            // 서버에서 보낸 상세 에러 메시지를 변수에 저장
+            const serverMessage = e?.response?.data?.message || e?.response?.data?.error || "상세 오류 메시지 없음";
+
+            // 🚨 콘솔에 상세 응답 출력 (가장 중요)
+            console.error("400 오류 발생, 서버 응답:", e.response);
+
+            if (code === 401 || code === 404) {
+                setErrorMsg("학번 또는 비밀번호가 올바르지 않습니다.");
+            } else if (code === 400) {
+                // 400인 경우 서버 메시지를 사용하여 구체적인 오류를 표시
+                setErrorMsg(`요청 데이터 오류: ${serverMessage}`);
+            }
             else setErrorMsg(e?.response?.data?.message || "로그인 중 오류가 발생했습니다.");
+
             setStep("loginError");
         }
         finally {

@@ -15,6 +15,7 @@ interface ModalProps {
     selectedTimes?: string[];
     roomName?: string;
     roomId?: string;
+    seatsPerSlot?: number;
 }
 
 const Modal = ({
@@ -24,6 +25,7 @@ const Modal = ({
                    selectedTimes,
                    roomName,
                    roomId,
+                   seatsPerSlot,
                }: ModalProps) => {
     const [step, setStep] = useState<ModalStep>(initialStep);
     const [studentId, setStudentId] = useState("");
@@ -66,6 +68,7 @@ const Modal = ({
                         selectedTimes={selectedTimes}
                         roomName={roomName}
                         roomId={roomId}
+                        seatsPerSlot={seatsPerSlot ?? 1}
                     />
                 )}
 

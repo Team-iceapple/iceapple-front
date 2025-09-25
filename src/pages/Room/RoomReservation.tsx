@@ -55,7 +55,6 @@ const RoomReservation = () => {
     const [modalOpen, setModalOpen] = useState(false);
     const [countMode, setCountMode] = useState(false); // count 배열을 주는 방인지 여부
 
-    // NEW: 백엔드가 내려주는 max-count(정원). 기본값은 4.
     const [seatsPerSlot, setSeatsPerSlot] = useState<number>(DEFAULT_SEATS_PER_SLOT);
 
     const [toast, setToast] = useState<{ msg: string; x: number; y: number } | null>(null);
@@ -86,6 +85,20 @@ const RoomReservation = () => {
 
     const startOfToday = new Date();
     startOfToday.setHours(0, 0, 0, 0);
+
+    const isPastTime = (timeSlot: string) => {
+        const today = new Date();
+        const [hour, minute] = timeSlot.split(":").map(Number);
+
+        const isToday = formatDate(date) === formatDate(today);
+
+        if (!isToday) return false;
+
+        const slotStart = new Date(today);
+        slotStart.setHours(hour, minute, 0, 0);
+
+        return slotStart <= today;
+    };
 
     const handleCloseModal = () => {
         setModalOpen(false);
@@ -121,7 +134,7 @@ const RoomReservation = () => {
         index: number
     ) => {
         const current = availability[index] ?? 0;
-        const isFull = countMode ? isFullByCount(current, seatsPerSlot) : current === 1; // max-count 반영
+        const isFull = countMode ? isFullByCount(current, seatsPerSlot) : current === 1;
         const checked = selectedTime.includes(time);
 
         if (isBlocked(checked, isFull)) {
@@ -184,13 +197,11 @@ const RoomReservation = () => {
                         : DEFAULT_SEATS_PER_SLOT
                 );
 
-                // 3) 모드 결정: count가 있으면 잔여좌석 모드
                 setCountMode(Array.isArray(res.data?.count));
                 setSelectedTime([]);
             } catch (e) {
                 setError("예약 현황을 불러오지 못했습니다.");
                 console.error(e);
-                // 실패 시: 모두 마감처럼 보이게 (countMode=true + 정원값으로 채움)
                 setAvailability(Array(timeSlots.length).fill(DEFAULT_SEATS_PER_SLOT));
                 setSeatsPerSlot(DEFAULT_SEATS_PER_SLOT);
                 setCountMode(true);
@@ -296,27 +307,34 @@ const RoomReservation = () => {
                             </thead>
                             <tbody>
                             {timeSlots.map((time, index) => {
-                                const current = availability[index] ?? 0; // countMode: 현재 예약 인원 / 아니면 0|1(불가)
+                                const current = availability[index] ?? 0;
                                 const full = countMode ? isFullByCount(current, seatsPerSlot) : current === 1;
                                 const remain = countMode ? remainingOf(current, seatsPerSlot) : 0;
                                 const checked = selectedTime.includes(time);
 
+                                const isPast = isPastTime(time);
+                                const isDisabled = full || loadingAvail || isPast;
+
                                 return (
                                     <tr
                                         key={index}
-                                        className={reservationStyles.timeRow}
-                                        onClick={(e) => tryToggleTime(e, time, index)}
+                                        className={`${reservationStyles.timeRow} ${isPast ? reservationStyles.pastTimeRow : ''}`}
+                                        onClick={(e) => {
+                                            if (isDisabled) return;
+                                            tryToggleTime(e, time, index);
+                                        }}
                                         onKeyDown={(e) => {
+                                            if (isDisabled) return;
                                             if (e.key === "Enter" || e.key === " ") {
                                                 e.preventDefault();
                                                 tryToggleTime(e, time, index);
                                             }
                                         }}
-                                        tabIndex={0}
+                                        tabIndex={isDisabled ? -1 : 0}
                                         aria-checked={checked}
                                         role="row"
                                         style={{
-                                            cursor: full || loadingAvail ? "not-allowed" : "pointer",
+                                            cursor: isDisabled ? "not-allowed" : "pointer",
                                         }}
                                     >
                                         <td>
@@ -331,15 +349,15 @@ const RoomReservation = () => {
                                                     checked={checked}
                                                     onClick={(e) => {
                                                         e.stopPropagation();
-                                                        if (isBlocked(checked, full)) {
+                                                        if (isDisabled || isBlocked(checked, full)) {
                                                             e.preventDefault();
-                                                            notifyAboveElement(e, `최대 ${MAX_SLOTS}개까지만 선택할 수 있어요.`);
+                                                            notifyAboveElement(e, isDisabled && isPast ? '이미 지난 시간이에요.' : `최대 ${MAX_SLOTS}개까지만 선택할 수 있어요.`);
                                                         }
                                                     }}
                                                     onChange={(e) => {
                                                         e.stopPropagation();
-                                                        if (isBlocked(checked, full)) {
-                                                            notifyAboveElement(e, `최대 ${MAX_SLOTS}개까지만 선택할 수 있어요.`);
+                                                        if (isDisabled || isBlocked(checked, full)) {
+                                                            notifyAboveElement(e, isDisabled && isPast ? '이미 지난 시간이에요.' : `최대 ${MAX_SLOTS}개까지만 선택할 수 있어요.`);
                                                             return;
                                                         }
                                                         if (full || loadingAvail) return;
@@ -347,7 +365,7 @@ const RoomReservation = () => {
                                                             checked ? prev.filter((t) => t !== time) : [...prev, time]
                                                         );
                                                     }}
-                                                    disabled={full || loadingAvail}
+                                                    disabled={isDisabled}
                                                     aria-disabled={!checked && !canPickMore}
                                                 />
                                             </div>
@@ -362,7 +380,9 @@ const RoomReservation = () => {
                                             </label>
                                         </td>
                                         <td>
-                                            {full ? (
+                                            {isPast ? (
+                                                <span className="text-danger fw-semibold">예약 불가</span>
+                                            ) : full ? (
                                                 <span className="text-danger fw-semibold">예약 마감</span>
                                             ) : (
                                                 <span className="text-success fw-semibold">가능</span>
@@ -426,6 +446,7 @@ const RoomReservation = () => {
                     selectedTimes={selectedTime}
                     roomName={rooms.find((r) => r.id === roomId)?.name || ""}
                     roomId={roomId!}
+                    seatsPerSlot={seatsPerSlot}
                 />
             )}
         </div>

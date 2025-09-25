@@ -76,6 +76,52 @@
     white-space: nowrap;
 }
 
+.seatCountStepper {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 1.7rem;
+    padding: 0 0.6vw;
+}
+
+.seatCountStepper label {
+    color: #333;
+    margin: 0;
+}
+
+.stepperControl {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.stepperControl span {
+    min-width: 3rem;
+    text-align: center;
+}
+
+.stepperControl button {
+    background-color: #FFFFFF;
+    color: #4399B5;
+    border: 1px solid #4399B5;
+    width: 2rem;
+    height: 2rem;
+    border-radius: 50%;
+    font-size: 1.2rem;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background-color 0.2s;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.stepperControl button:disabled {
+    cursor: not-allowed;
+    background-color: #f0f0f0;
+    box-shadow: none; /* 비활성화 시 그림자 제거 */
+}
+
 
 /*예약 정보 - 확정,취소 확인용*/
 .confirmationBox {

@@ -124,7 +124,7 @@ const Home = () => {
             if (el && i !== activeIndex) {
                 try {
                     el.pause();
-                } catch {}
+                } catch { /* empty */ }
             }
         });
 

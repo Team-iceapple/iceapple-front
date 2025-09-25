@@ -10,6 +10,7 @@ type Props = {
     selectedTimes: string[];
     roomName: string;
     roomId: string;
+    seatsPerSlot: number;
 };
 
 const toYMD = (d: Date) => {
@@ -32,10 +33,12 @@ const formatPhone = (raw: string) => {
     return raw;
 };
 
-const ReservationForm = ({ date, selectedTimes, roomName, roomId }: Props) => {
+const ReservationForm = ({ date, selectedTimes, roomName, roomId, seatsPerSlot }: Props) => {
     const [studentId, setStudentId] = useState("");
     const [phone, setPhone] = useState("");
     const [password, setPassword] = useState("");
+    const [seatCount, setSeatCount] = useState("1");
+
     const [currentInput, setCurrentInput] =
         useState<"studentId" | "phone" | "password" | null>(null);
 
@@ -44,7 +47,7 @@ const ReservationForm = ({ date, selectedTimes, roomName, roomId }: Props) => {
     const [isConfirmed, setIsConfirmed] = useState(false);
 
     const sortedSelectedTimes = useMemo(() => {
-        const unique = Array.from(new Set(selectedTimes)); // 중복 제거(있다면)
+        const unique = Array.from(new Set(selectedTimes));
         return unique.sort((a, b) => timeToHour(a) - timeToHour(b));
     }, [selectedTimes]);
 
@@ -57,6 +60,18 @@ const ReservationForm = ({ date, selectedTimes, roomName, roomId }: Props) => {
             }).format(date),
         [date]
     );
+
+    const seatCountNum = parseInt(seatCount, 10);
+    const maxSeatCount = seatsPerSlot > 0 ? seatsPerSlot : 1;
+
+    const handleSeatCountChange = (delta: 1 | -1) => {
+        const currentCount = parseInt(seatCount, 10);
+        const newCount = currentCount + delta;
+
+        if (newCount >= 1 && newCount <= maxSeatCount) {
+            setSeatCount(String(newCount));
+        }
+    };
 
     const handleSubmit = async () => {
         if (!/^\d{8}$/.test(studentId)) {
@@ -75,6 +90,10 @@ const ReservationForm = ({ date, selectedTimes, roomName, roomId }: Props) => {
             setShowError("시간을 선택해주세요.");
             return;
         }
+        if (seatCountNum <= 0 || seatCountNum > maxSeatCount) {
+            setShowError(`예약 좌석은 1개부터 최대 ${maxSeatCount}개까지 가능합니다.`);
+            return;
+        }
 
         const times = Array.from(new Set(selectedTimes.map(timeToHour))).sort(
             (a, b) => a - b
@@ -87,6 +106,7 @@ const ReservationForm = ({ date, selectedTimes, roomName, roomId }: Props) => {
             place_id: roomId,
             date: toYMD(date),
             times,
+            seat_count: seatCountNum,
         };
 
         setShowError(null);
@@ -158,6 +178,26 @@ const ReservationForm = ({ date, selectedTimes, roomName, roomId }: Props) => {
 
             <div style={{ width: "100%" }}>
                 <div className={styles.inputGroup}>
+                    <div className={styles.seatCountStepper}>
+                        <label> 예약 좌석 수 </label>
+                        <div className={styles.stepperControl}>
+                            <button
+                                type="button"
+                                onClick={() => handleSeatCountChange(-1)}
+                                disabled={seatCountNum <= 1}
+                            >
+                                -
+                            </button>
+                            <span>{seatCountNum}</span>
+                            <button
+                                type="button"
+                                onClick={() => handleSeatCountChange(1)}
+                                disabled={seatCountNum >= maxSeatCount}
+                            >
+                                +
+                            </button>
+                        </div>
+                    </div>
                     <input
                         className={`${styles.input} ${
                             currentInput === "studentId" ? styles.inputActive : ""
