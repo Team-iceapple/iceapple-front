@@ -4,7 +4,6 @@ import {Swiper, SwiperSlide} from "swiper/react";
 import "swiper/css";
 import "swiper/css/pagination";
 import {Pagination} from "swiper/modules";
-// ⭐ Iconify 라이브러리 임포트
 import { Icon } from '@iconify/react';
 
 const API_BASE = import.meta.env.VITE_API_BASE_URL;
@@ -43,7 +42,6 @@ const Home = () => {
     const [videoUrls, setVideoUrls] = useState<string[]>([]);
     const [activeIndex, setActiveIndex] = useState(0);
     const [autoplayFailed, setAutoplayFailed] = useState(false);
-    // 🔊/🔇 두 상태: 0(뮤트) 또는 1(최대 볼륨)
     const [preferredVolume, setPreferredVolume] = useState<number>(0);
     const videoRefs = useRef<(HTMLVideoElement | null)[]>([]);
     const paginationRef = useRef<HTMLDivElement | null>(null);
@@ -91,24 +89,20 @@ const Home = () => {
             videoRefs.current.forEach((v) => {
                 try {
                     v?.pause();
-                } catch {
-                }
+                } catch { /* empty */ }
             });
         };
     }, []);
 
-    // 활성 슬라이드/볼륨 상태 변경 시 적용
     useEffect(() => {
         if (!videoUrls.length) return;
-        // 비활성 비디오는 정지 + 음소거 초기화
         videoRefs.current.forEach((el, i) => {
             if (!el) return;
             try {
                 if (i !== activeIndex) el.pause();
                 el.muted = true;
                 el.volume = 0;
-            } catch {
-            }
+            } catch { /* empty */ }
         });
         const v = videoRefs.current[activeIndex];
         if (v) {
@@ -142,7 +136,6 @@ const Home = () => {
         setActiveIndex(swiper.realIndex ?? swiper.activeIndex ?? 0);
     };
 
-    // 🔘 0 ↔ 1 토글
     const toggleVolume = () => {
         const next = preferredVolume === 0 ? 1 : 0;
         setPreferredVolume(next);
@@ -171,7 +164,9 @@ const Home = () => {
                             }}
                             onBeforeInit={(swiper) => {
                                 if (typeof swiper.params.pagination !== "boolean" && paginationRef.current) {
-                                    swiper.params.pagination.el = paginationRef.current;
+                                    if (swiper.params.pagination) {
+                                        swiper.params.pagination.el = paginationRef.current;
+                                    }
                                 }
                             }}
                             pagination={{clickable: true}}
@@ -186,8 +181,6 @@ const Home = () => {
                                             videoRefs.current[idx] = el;
                                         }}
                                         src={src}
-                                        // 🔸 autoplay 정책 통과를 위해 초기엔 muted=true 가 안전하지만
-                                        // 상태에 맞춰 속성으로도 반영 (복제 슬라이드 포함)
                                         muted={preferredVolume === 0}
                                         playsInline
                                         autoPlay={idx === activeIndex}
@@ -216,7 +209,6 @@ const Home = () => {
                                 </SwiperSlide>
                             ))}
                         </Swiper>
-                        {/* 🔘 볼륨 토글 버튼: 🔇 / 🔊 */}
                         <button
                             className={styles.volumeBtn}
                             onClick={toggleVolume}
@@ -224,11 +216,10 @@ const Home = () => {
                             aria-pressed={preferredVolume !== 0}
                             title={preferredVolume === 0 ? "볼륨 켜기" : "볼륨 끄기"}
                         >
-                            {/* ⭐ Icon 컴포넌트로 교체 */}
                             <Icon
                                 icon={volumeIconName}
                                 className={styles.emoji}
-                                style={{ color: '#fff' }} // Iconify는 기본적으로 currentColor를 사용하지만, 명시적으로 흰색 지정
+                                style={{ color: '#fff' }}
                             />
                         </button>
                         {autoplayFailed && (
@@ -252,7 +243,6 @@ const Home = () => {
                     <p>비디오를 불러오는 중...</p>
                 )}
             </div>
-            {/* 바깥 컨테이너 페이지네이션 */}
             <div ref={paginationRef} className={styles.pagination}/>
         </div>
     );
