@@ -1,5 +1,5 @@
 import type React from "react";
-import { type ChangeEvent, useEffect, useRef, useState } from "react";
+import { type ChangeEvent, useEffect, useRef, useState} from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import Calendar from "react-calendar";
 import "react-calendar/dist/Calendar.css";
@@ -53,7 +53,7 @@ const RoomReservation = () => {
     const [loadingAvail, setLoadingAvail] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const [modalOpen, setModalOpen] = useState(false);
-    const [countMode, setCountMode] = useState(false); // count 배열을 주는 방인지 여부
+    const [countMode, setCountMode] = useState(false);
 
     const [seatsPerSlot, setSeatsPerSlot] = useState<number>(DEFAULT_SEATS_PER_SLOT);
 
@@ -81,7 +81,7 @@ const RoomReservation = () => {
             const targetPage = Math.floor(idx / PAGE_SIZE);
             if (targetPage !== page) setPage(targetPage);
         }
-    }, [rooms, roomId]); // 자동 페이지 이동
+    }, [rooms, roomId]);
 
     const startOfToday = new Date();
     startOfToday.setHours(0, 0, 0, 0);
@@ -151,12 +151,19 @@ const RoomReservation = () => {
             setLoadingRooms(true);
             setError(null);
             try {
-                // API_BASE_URL이 /로 끝나므로 뒤에 슬래시 없이 이어붙임
                 const res = await axios.get(`${API_BASE_URL}places`, {
                     headers: { Accept: "application/json" },
                 });
                 const list: Room[] = res.data?.places ?? [];
-                setRooms(list);
+
+                const sortedList = list.sort((a, b) => {
+                    const numA = parseInt(a.name.match(/\d+/g)?.pop() || '0', 10);
+                    const numB = parseInt(b.name.match(/\d+/g)?.pop() || '0', 10);
+
+                    return numA - numB;
+                });
+
+                setRooms(sortedList);
             } catch (e) {
                 setError("회의실 목록을 불러오지 못했습니다.");
                 console.error(e);
@@ -178,12 +185,10 @@ const RoomReservation = () => {
                     { headers: { Accept: "application/json" } }
                 );
 
-                // 1) count(현재 예약 인원)
                 const counts: number[] = res.data?.count ?? [];
                 const filled = Array.from({ length: timeSlots.length }, (_, i) => counts[i] ?? 0);
                 setAvailability(filled);
 
-                // 2) max-count(정원) 수신: 다양한 키 호환
                 const maxCountFromApi =
                     res.data?.maxCount ??
                     res.data?.max_count ??
@@ -211,6 +216,19 @@ const RoomReservation = () => {
         };
         fetchAvailability();
     }, [roomId, date]);
+
+
+    const minAvailableSeats = selectedTime.reduce((minSeats, time) => {
+        const index = timeSlots.indexOf(time);
+
+        if (index === -1 || !countMode) return minSeats;
+
+        const currentCount = availability[index] ?? 0;
+        const remaining = remainingOf(currentCount, seatsPerSlot);
+
+        return Math.min(minSeats, remaining);
+    }, seatsPerSlot);
+
 
     return (
         <div className={baseStyles.container}>
@@ -447,6 +465,7 @@ const RoomReservation = () => {
                     roomName={rooms.find((r) => r.id === roomId)?.name || ""}
                     roomId={roomId!}
                     seatsPerSlot={seatsPerSlot}
+                    minAvailableSeats={minAvailableSeats}
                 />
             )}
         </div>

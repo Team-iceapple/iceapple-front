@@ -11,6 +11,7 @@ type Props = {
     roomName: string;
     roomId: string;
     seatsPerSlot: number;
+    minAvailableSeats: number;
 };
 
 const toYMD = (d: Date) => {
@@ -33,11 +34,15 @@ const formatPhone = (raw: string) => {
     return raw;
 };
 
-const ReservationForm = ({ date, selectedTimes, roomName, roomId, seatsPerSlot }: Props) => {
+const ReservationForm = ({ date, selectedTimes, roomName, roomId, seatsPerSlot, minAvailableSeats }: Props) => {
     const [studentId, setStudentId] = useState("");
     const [phone, setPhone] = useState("");
     const [password, setPassword] = useState("");
     const [seatCount, setSeatCount] = useState("1");
+
+    const maxSelectableSeats = Math.min(seatsPerSlot, minAvailableSeats);
+    const finalMaxSeats = Math.max(0, maxSelectableSeats);
+
 
     const [currentInput, setCurrentInput] =
         useState<"studentId" | "phone" | "password" | null>(null);
@@ -62,13 +67,12 @@ const ReservationForm = ({ date, selectedTimes, roomName, roomId, seatsPerSlot }
     );
 
     const seatCountNum = parseInt(seatCount, 10);
-    const maxSeatCount = seatsPerSlot > 0 ? seatsPerSlot : 1;
 
     const handleSeatCountChange = (delta: 1 | -1) => {
         const currentCount = parseInt(seatCount, 10);
         const newCount = currentCount + delta;
 
-        if (newCount >= 1 && newCount <= maxSeatCount) {
+        if (newCount >= 1 && newCount <= finalMaxSeats) {
             setSeatCount(String(newCount));
         }
     };
@@ -90,8 +94,9 @@ const ReservationForm = ({ date, selectedTimes, roomName, roomId, seatsPerSlot }
             setShowError("시간을 선택해주세요.");
             return;
         }
-        if (seatCountNum <= 0 || seatCountNum > maxSeatCount) {
-            setShowError(`예약 좌석은 1개부터 최대 ${maxSeatCount}개까지 가능합니다.`);
+
+        if (seatCountNum <= 0 || seatCountNum > finalMaxSeats) {
+            setShowError(`예약 좌석은 1개부터 최대 ${finalMaxSeats}개(잔여 좌석)까지 가능합니다.`);
             return;
         }
 
@@ -192,7 +197,8 @@ const ReservationForm = ({ date, selectedTimes, roomName, roomId, seatsPerSlot }
                             <button
                                 type="button"
                                 onClick={() => handleSeatCountChange(1)}
-                                disabled={seatCountNum >= maxSeatCount}
+                                // 💡 수정: finalMaxSeats로 증가를 제한합니다.
+                                disabled={seatCountNum >= finalMaxSeats}
                             >
                                 +
                             </button>

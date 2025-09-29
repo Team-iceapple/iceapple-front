@@ -9,9 +9,10 @@ interface Reservation {
     date: string;
     times: number[];
     place: { id: string; name: string };
+    count: number;
 }
 
-type CancelledItem = { date: string; times: string[]; room: string };
+type CancelledItem = { date: string; times: string[]; room: string; count: number; };
 
 interface ReservationListProps {
     studentId: string;
@@ -36,7 +37,7 @@ const ReservationList = ({ studentId, password, setStep, setCancelledData }: Res
                     student_number: studentId,
                     password,
                 });
-                setReservations(Array.isArray(res.data) ? res.data : []);
+                setReservations(Array.isArray(res.data) ? res.data : res.data?.reservations ?? []);
             } catch (e) {
                 console.error(e);
                 setError("예약 내역을 불러오지 못했습니다.");
@@ -80,13 +81,16 @@ const ReservationList = ({ studentId, password, setStep, setCancelledData }: Res
         try {
             setLoading(true);
             setError(null);
+
             const cancelledForUI = reservations
                 .filter(r => selectedIds.includes(r.id))
                 .map(r => ({
                     date: r.date,
                     times: (r.times ?? []).map(fmtTime),
                     room: r.place?.name ?? "",
+                    count: r.count,
                 }));
+
             await axios.delete(`${API_BASE_URL}/reservations`, {
                 data: {
                     reservation_id: selectedIds,
@@ -115,7 +119,9 @@ const ReservationList = ({ studentId, password, setStep, setCancelledData }: Res
     return (
         <>
             <div className={styles.listContainer}>
-                <div className={styles.confirmationId}>{studentId} 님의 예약 내역</div>
+                <div className={styles.confirmationId}>
+                    {studentId} 님의 예약 내역 ({visibleReservations.length}건)
+                </div>
 
                 <div className={styles.reservationList}>
                     {loading && <div className={styles.empty}>불러오는 중…</div>}
@@ -140,7 +146,9 @@ const ReservationList = ({ studentId, password, setStep, setCancelledData }: Res
                                             <div key={i}>{fmtTime(t)}</div>
                                         ))}
                                     </div>
-                                    <div className={styles.roomColumn}>{res.place.name}</div>
+                                    <div className={styles.roomColumn}>
+                                        {res.place.name} ({res.count}좌석)
+                                    </div>
                                 </div>
                             </label>
                         ))}
