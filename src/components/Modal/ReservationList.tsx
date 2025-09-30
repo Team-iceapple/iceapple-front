@@ -9,7 +9,7 @@ interface Reservation {
     date: string;
     times: number[];
     place: { id: string; name: string };
-    count: number;
+    res_count: number;
 }
 
 type CancelledItem = { date: string; times: string[]; room: string; count: number; };
@@ -88,7 +88,7 @@ const ReservationList = ({ studentId, password, setStep, setCancelledData }: Res
                     date: r.date,
                     times: (r.times ?? []).map(fmtTime),
                     room: r.place?.name ?? "",
-                    count: r.count,
+                    count: r.res_count,
                 }));
 
             await axios.delete(`${API_BASE_URL}/reservations`, {
@@ -147,8 +147,8 @@ const ReservationList = ({ studentId, password, setStep, setCancelledData }: Res
                                         ))}
                                     </div>
                                     <div className={styles.roomColumn}>
-                                        {res.place.name} ({res.count}좌석)
                                     </div>
+                                    {res.place.name} ({res.res_count}좌석)
                                 </div>
                             </label>
                         ))}

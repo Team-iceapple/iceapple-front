@@ -12,6 +12,7 @@ type Props = {
     roomId: string;
     seatsPerSlot: number;
     minAvailableSeats: number;
+    onReservationSuccess?: () => void;
 };
 
 const toYMD = (d: Date) => {
@@ -34,7 +35,7 @@ const formatPhone = (raw: string) => {
     return raw;
 };
 
-const ReservationForm = ({ date, selectedTimes, roomName, roomId, seatsPerSlot, minAvailableSeats }: Props) => {
+const ReservationForm = ({ date, selectedTimes, roomName, roomId, seatsPerSlot, minAvailableSeats, onReservationSuccess }: Props) => {
     const [studentId, setStudentId] = useState("");
     const [phone, setPhone] = useState("");
     const [password, setPassword] = useState("");
@@ -111,18 +112,28 @@ const ReservationForm = ({ date, selectedTimes, roomName, roomId, seatsPerSlot, 
             place_id: roomId,
             date: toYMD(date),
             times,
-            seat_count: seatCountNum,
+            res_count: seatCountNum,
         };
 
         setShowError(null);
         setSubmitting(true);
         try {
-            await axios.post(`${API_BASE_URL}/reservations`, payload, {
+            const response = await axios.post(`${API_BASE_URL}/reservations`, payload, {
                 headers: { "Content-Type": "application/json", Accept: "application/json" },
             });
-            setIsConfirmed(true);
+
+            console.log("✅ 예약 요청 성공. 서버 응답:", response.data);
+
+            if (onReservationSuccess) {
+                onReservationSuccess();
+            } else {
+                setIsConfirmed(true);
+            }
+
         } catch (err) {
             const axiosErr = err as AxiosError<{ message?: string }>;
+            console.error("❌ 예약 실패. API 오류 응답:", axiosErr.response);
+
             const msg =
                 axiosErr.response?.data?.message ||
                 "예약에 실패했습니다. 입력 정보를 다시 확인해주세요.";
@@ -197,7 +208,6 @@ const ReservationForm = ({ date, selectedTimes, roomName, roomId, seatsPerSlot, 
                             <button
                                 type="button"
                                 onClick={() => handleSeatCountChange(1)}
-                                // 💡 수정: finalMaxSeats로 증가를 제한합니다.
                                 disabled={seatCountNum >= finalMaxSeats}
                             >
                                 +

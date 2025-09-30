@@ -1,10 +1,10 @@
-import {useEffect, useRef, useState} from "react";
+import { useEffect, useRef, useState } from "react";
 import styles from "./Home.module.css";
-import {Swiper, SwiperSlide} from "swiper/react";
+import { Swiper, SwiperSlide } from "swiper/react";
 import "swiper/css";
 import "swiper/css/pagination";
-import {Pagination} from "swiper/modules";
-import { Icon } from '@iconify/react';
+import { Pagination } from "swiper/modules";
+import { Icon } from "@iconify/react";
 
 const API_BASE = import.meta.env.VITE_API_BASE_URL;
 const API = new URL(API_BASE);
@@ -43,9 +43,11 @@ const Home = () => {
     const [activeIndex, setActiveIndex] = useState(0);
     const [autoplayFailed, setAutoplayFailed] = useState(false);
     const [preferredVolume, setPreferredVolume] = useState<number>(0);
+
     const videoRefs = useRef<(HTMLVideoElement | null)[]>([]);
     const paginationRef = useRef<HTMLDivElement | null>(null);
     const swiperRef = useRef<any>(null);
+    const prevIndexRef = useRef(0);
 
     useEffect(() => {
         let abort = false;
@@ -55,7 +57,7 @@ const Home = () => {
                 let urls: string[] = [];
                 let lastErr: unknown = null;
                 try {
-                    const res = await fetch(listEndpoints[0], {headers: {Accept: "application/json"}});
+                    const res = await fetch(listEndpoints[0], { headers: { Accept: "application/json" } });
                     if (res.ok) {
                         const data = await res.json();
                         const arr: VideoItem[] = Array.isArray(data) ? data : data?.items ?? [];
@@ -77,6 +79,7 @@ const Home = () => {
                 }
                 setVideoUrls(urls);
                 setActiveIndex(0);
+                prevIndexRef.current = 0;
             } catch (err) {
                 if (!abort) {
                     console.error("비디오 로드 실패(예외):", err);
@@ -89,23 +92,28 @@ const Home = () => {
             videoRefs.current.forEach((v) => {
                 try {
                     v?.pause();
-                } catch { /* empty */ }
+                } catch {}
             });
         };
     }, []);
 
     useEffect(() => {
         if (!videoUrls.length) return;
+
         videoRefs.current.forEach((el, i) => {
             if (!el) return;
             try {
                 if (i !== activeIndex) el.pause();
                 el.muted = true;
                 el.volume = 0;
-            } catch { /* empty */ }
+            } catch {}
         });
+
         const v = videoRefs.current[activeIndex];
         if (v) {
+            try {
+                v.currentTime = 0;
+            } catch {}
             v.muted = preferredVolume === 0;
             v.volume = preferredVolume;
             (v as any).playsInline = true;
@@ -120,6 +128,9 @@ const Home = () => {
                         try {
                             v.muted = preferredVolume === 0;
                             v.volume = preferredVolume;
+                            try {
+                                v.currentTime = 0;
+                            } catch {}
                             await v.play();
                             setAutoplayFailed(false);
                         } catch {
@@ -133,7 +144,33 @@ const Home = () => {
     }, [activeIndex, videoUrls, preferredVolume]);
 
     const handleSlideChange = (swiper: any) => {
-        setActiveIndex(swiper.realIndex ?? swiper.activeIndex ?? 0);
+        const nextIdx = swiper.realIndex ?? swiper.activeIndex ?? 0;
+        const prevIdx = prevIndexRef.current;
+
+        const prevV = videoRefs.current[prevIdx];
+        if (prevV) {
+            try {
+                prevV.pause();
+            } catch {}
+            try {
+                prevV.currentTime = 0;
+            } catch {}
+        }
+
+        const nextV = videoRefs.current[nextIdx];
+        if (nextV) {
+            try {
+                nextV.currentTime = 0;
+            } catch {}
+            try {
+                nextV.muted = preferredVolume === 0;
+                nextV.volume = preferredVolume;
+                nextV.play().catch(() => {});
+            } catch {}
+        }
+
+        setActiveIndex(nextIdx);
+        prevIndexRef.current = nextIdx;
     };
 
     const toggleVolume = () => {
@@ -144,13 +181,12 @@ const Home = () => {
             v.muted = next === 0;
             v.volume = next;
             if (v.paused) {
-                v.play().catch(() => {
-                });
+                v.play().catch(() => {});
             }
         }
     };
 
-    const volumeIconName = preferredVolume === 0 ? 'mdi:volume-off' : 'mdi:volume-high';
+    const volumeIconName = preferredVolume === 0 ? "mdi:volume-off" : "mdi:volume-high";
 
     return (
         <div className={styles.container}>
@@ -169,7 +205,7 @@ const Home = () => {
                                     }
                                 }
                             }}
-                            pagination={{clickable: true}}
+                            pagination={{ clickable: true }}
                             loop={videoUrls.length > 1}
                             onSlideChange={handleSlideChange}
                             className={styles.swiper}
@@ -193,6 +229,9 @@ const Home = () => {
                                             if (!v) return;
                                             v.muted = preferredVolume === 0;
                                             v.volume = preferredVolume;
+                                            try {
+                                                v.currentTime = 0;
+                                            } catch {}
                                             if (idx === activeIndex) {
                                                 v.play().catch(() => setAutoplayFailed(true));
                                             }
@@ -209,6 +248,7 @@ const Home = () => {
                                 </SwiperSlide>
                             ))}
                         </Swiper>
+
                         <button
                             className={styles.volumeBtn}
                             onClick={toggleVolume}
@@ -216,12 +256,9 @@ const Home = () => {
                             aria-pressed={preferredVolume !== 0}
                             title={preferredVolume === 0 ? "볼륨 켜기" : "볼륨 끄기"}
                         >
-                            <Icon
-                                icon={volumeIconName}
-                                className={styles.emoji}
-                                style={{ color: '#fff' }}
-                            />
+                            <Icon icon={volumeIconName} className={styles.emoji} style={{ color: "#fff" }} />
                         </button>
+
                         {autoplayFailed && (
                             <button
                                 className={styles.playOverlay}
@@ -230,8 +267,10 @@ const Home = () => {
                                     if (v) {
                                         v.muted = preferredVolume === 0;
                                         v.volume = preferredVolume;
-                                        v.play().catch(() => {
-                                        });
+                                        try {
+                                            v.currentTime = 0;
+                                        } catch {}
+                                        v.play().catch(() => {});
                                     }
                                 }}
                             >
@@ -243,8 +282,9 @@ const Home = () => {
                     <p>비디오를 불러오는 중...</p>
                 )}
             </div>
-            <div ref={paginationRef} className={styles.pagination}/>
+            <div ref={paginationRef} className={styles.pagination} />
         </div>
     );
 };
+
 export default Home;
