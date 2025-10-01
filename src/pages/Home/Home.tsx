@@ -3,7 +3,6 @@ import styles from "./Home.module.css";
 import { Swiper, SwiperSlide } from "swiper/react";
 import "swiper/css";
 import "swiper/css/pagination";
-import { Pagination } from "swiper/modules";
 import { Icon } from "@iconify/react";
 
 const API_BASE = import.meta.env.VITE_API_BASE_URL;
@@ -45,7 +44,6 @@ const Home = () => {
     const [preferredVolume, setPreferredVolume] = useState<number>(0);
 
     const videoRefs = useRef<(HTMLVideoElement | null)[]>([]);
-    const paginationRef = useRef<HTMLDivElement | null>(null);
     const swiperRef = useRef<any>(null);
     const prevIndexRef = useRef(0);
 
@@ -194,18 +192,18 @@ const Home = () => {
                 {videoUrls.length > 0 ? (
                     <>
                         <Swiper
-                            modules={[Pagination]}
+                            // modules={[Pagination]}
                             onSwiper={(sw) => {
                                 swiperRef.current = sw;
                             }}
-                            onBeforeInit={(swiper) => {
-                                if (typeof swiper.params.pagination !== "boolean" && paginationRef.current) {
-                                    if (swiper.params.pagination) {
-                                        swiper.params.pagination.el = paginationRef.current;
-                                    }
-                                }
-                            }}
-                            pagination={{ clickable: true }}
+                            // onBeforeInit={(swiper) => {
+                            //     if (typeof swiper.params.pagination !== "boolean" && paginationRef.current) {
+                            //         if (swiper.params.pagination) {
+                            //             swiper.params.pagination.el = paginationRef.current;
+                            //         }
+                            //     }
+                            // }}
+                            // pagination={{ clickable: true }}
                             loop={videoUrls.length > 1}
                             onSlideChange={handleSlideChange}
                             className={styles.swiper}
@@ -220,10 +218,10 @@ const Home = () => {
                                         muted={preferredVolume === 0}
                                         playsInline
                                         autoPlay={idx === activeIndex}
-                                        loop={false}
+                                        loop={true}
                                         preload="auto"
                                         className={styles.video}
-                                        crossOrigin="anonymous"
+                                        // crossOrigin="anonymous"
                                         onLoadedMetadata={() => {
                                             const v = videoRefs.current[idx];
                                             if (!v) return;
@@ -231,7 +229,7 @@ const Home = () => {
                                             v.volume = preferredVolume;
                                             try {
                                                 v.currentTime = 0;
-                                            } catch {}
+                                            } catch { /* empty */ }
                                             if (idx === activeIndex) {
                                                 v.play().catch(() => setAutoplayFailed(true));
                                             }
