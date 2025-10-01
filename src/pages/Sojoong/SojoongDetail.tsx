@@ -389,28 +389,6 @@ const SojoongDetail = ({ id, onClose }: Props) => {
                         </button>
                         <button
                             className={styles.railBtn}
-                            title="이전 섹션"
-                            onMouseDown={() => startHold(() => goToNextHeading(-1))}
-                            onMouseUp={stopHold}
-                            onMouseLeave={stopHold}
-                            onTouchStart={() => startHold(() => goToNextHeading(-1))}
-                            onTouchEnd={stopHold}
-                        >
-                            « 섹션
-                        </button>
-                        <button
-                            className={styles.railBtn}
-                            title="다음 섹션"
-                            onMouseDown={() => startHold(() => goToNextHeading(1))}
-                            onMouseUp={stopHold}
-                            onMouseLeave={stopHold}
-                            onTouchStart={() => startHold(() => goToNextHeading(1))}
-                            onTouchEnd={stopHold}
-                        >
-                            섹션 »
-                        </button>
-                        <button
-                            className={styles.railBtn}
                             title="아래로 한 페이지"
                             onMouseDown={() => startHold(() => scrollByPage(1))}
                             onMouseUp={stopHold}

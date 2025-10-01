@@ -28,10 +28,10 @@
     object-fit: cover;
 }
 
-.pagination {
-    margin-top: 0.8vw;
-    margin-left: 68vw;
-}
+/*.pagination {*/
+/*    margin-top: 0.8vw;*/
+/*    margin-left: 68vw;*/
+/*}*/
 
 .volumeBtn {
     position: absolute;

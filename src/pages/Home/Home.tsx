@@ -282,7 +282,7 @@ const Home = () => {
                     <p>비디오를 불러오는 중...</p>
                 )}
             </div>
-            <div ref={paginationRef} className={styles.pagination} />
+             {/*<div ref={paginationRef} className={styles.pagination} />*/}
         </div>
     );
 };

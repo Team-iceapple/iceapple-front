@@ -11,7 +11,7 @@ type NoticeDetailDto = {
     content: string;
     createdAt: string;
     has_attachment: boolean;
-    url?: string; // ✅ API의 url 필드
+    url?: string;
 };
 
 const KOGL_TEXT = "공공누리 제4유형: 출처표시 + 상업적 이용금지 + 변경금지";
@@ -103,7 +103,7 @@ const NoticeDetail = ({ id, onClose }: Props) => {
                     content: data.content,
                     createdAt: data.createdAt || data.created_at || "",
                     has_attachment: data.has_attachment,
-                    url: data.url, // ✅ 저장
+                    url: data.url,
                 };
                 setNotice(mapped);
                 setError(null);
@@ -341,8 +341,6 @@ const NoticeDetail = ({ id, onClose }: Props) => {
                             <span>{Math.round(zoom * 100)}%</span>
                             <button aria-label="크게" onClick={() => setZoom((z) => Math.min(1.8, +(z + 0.1).toFixed(2)))}>+</button>
                         </div>
-
-                        {/* ✅ QR을 클릭하면 API에서 내려준 url로 이동 */}
                         <a
                             href={linkUrl}
                             target="_blank"
@@ -374,7 +372,6 @@ const NoticeDetail = ({ id, onClose }: Props) => {
                     </div>
                 </div>
 
-                {/* ▼ (필요 시) 모달 내부 우하단 플로팅 버튼들 – 기존 그대로 사용 */}
                 <div className={styles.floatDock}>
                     <button
                         className={`${styles.scrollTopBtn} ${showTop ? "" : styles.scrollTopBtnHidden}`}
@@ -408,7 +405,6 @@ const NoticeDetail = ({ id, onClose }: Props) => {
                         </button>
                     </div>
                 </div>
-                {/* ▲ */}
             </div>
         </div>
     );
