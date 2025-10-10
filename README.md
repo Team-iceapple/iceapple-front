@@ -1,16 +1,29 @@
-<div align="center">
+# ✨ Iceapple Frontend
 
-<!-- logo -->
-<img src="https://avatars.githubusercontent.com/u/211306459?s=200&v=4" width="100"/>
+![logo](https://avatars.githubusercontent.com/u/211306459?s=200&v=4)
 
-### Iceapple-Frontend
+> 💡 **삼성 OLED TV 환경에 최적화된 키오스크형 웹 애플리케이션**  
+> React 기반의 공지 · 공간 예약 · 프로젝트 관리 기능을 제공합니다.
 
-</div> 
+---
 
-## 📝 소개
-Iceapple 프로젝트의 Frontend 팀 레포지토리입니다.
+## 🧭 프로젝트 소개
+
+**Iceapple Frontend**는 실시간 공지, 공간 예약, 연구실 프로젝트 관리 기능을 통합한  
+**학내/기관용 디스플레이 웹 애플리케이션**입니다.  
+TV, 키오스크, 웹 등 다양한 환경에 대응하도록 설계되었습니다.
+
+---
+
+## ⚙️ 설치 및 실행
+
+```bash
+pnpm install
+pnpm dev
+```
 
 <br />
+
 
 ### 화면 구성
 |Home|
@@ -98,9 +111,6 @@ Iceapple 프로젝트의 Frontend 팀 레포지토리입니다.
 </div>
 
 <br />
-
-## 🤔 기술적 이슈와 해결 과정
-추가 예정
 
 <br />
 
