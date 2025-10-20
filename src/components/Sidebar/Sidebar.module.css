@@ -8,6 +8,7 @@
     width: 16vw;
     height: 83vh;
     padding: 0 10px;
+    overflow: hidden;
 }
 
 .logo {
@@ -40,6 +41,10 @@
     flex-direction: column;
     gap: 1vw;
     width: 100%;
+    flex: 1 1 auto;
+    min-height: 0;
+    overflow-y: auto;
+    padding-right: 4px;
 }
 
 .link {

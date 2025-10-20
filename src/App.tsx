@@ -8,6 +8,7 @@ import Notice from "./pages/Notice/Notice";
 import Room from "./pages/Room/Room";
 import RoomReservation from "./pages/Room/RoomReservation";
 import Sojoong from "./pages/Sojoong/Sojoong";
+import Dashboard from "./pages/Dashboard/Dashboard";
 
 const App: React.FC = () => {
 
@@ -36,6 +37,7 @@ const App: React.FC = () => {
                     <Route path="/works/:workid" element={<ProjectDetail />} />
                     <Route path="/rooms" element={<Room />} />
                     <Route path="/rooms/:roomId" element={<RoomReservation />} />
+                    <Route path="/dashboard/:slug" element={<Dashboard />} />
                 </Routes>
             </Layout>
         </Router>
