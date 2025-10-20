@@ -183,7 +183,7 @@ const Sidebar = () => {
                         }}
                     >
                         <Icon icon="lucide:layout-dashboard" className={styles.icon} />
-                        강의실 환경 정보
+                        강의실 IAQ
                         <Icon
                             icon="lucide:chevron-down"
                             className={`${styles.caret} ${openDashboard ? styles.caretOpen : ''}`}
