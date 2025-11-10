@@ -38,57 +38,49 @@ pnpm dev
 
 |공지사항 상세|
 |:---:|
-|<img src="https://github.com/user-attachments/assets/4f696d7e-84d4-461c-8bf9-737f1c8c2451" width="450"/>|
+|<img src="https://github.com/user-attachments/assets/622bab75-e6c4-41ae-8fbc-4b6e14a2ad76" width="450"/>|
 |각 공지사항에 대한 세부적인 내용을 확인할 수 있다.|
 
-|공간 예약|
+|회의실 예약|
 |:---:|
-|<img src="https://github.com/user-attachments/assets/c2c00b3c-524e-4fb5-9282-aa284c9ea686" width="450"/>|
-|공간을 예약하거나 공간에 대한 정보를 확인할 수 있다.|
+|<img src="https://github.com/user-attachments/assets/52264138-35dd-485c-bae3-f4f1461e6b33" width="450"/>|
+|회의실을 예약하거나 공간에 대한 정보를 확인할 수 있다.|
 
-|공간 상세 - 506|
-|:---:|
-|<img src="https://github.com/user-attachments/assets/64b07050-35ed-478a-8930-d4a7cd4547fc" width="450"/>|
-|공간에 대한 상세 정보와 예약 현황을 확인할 수 있다.|
 
-|공간 상세 - 504|
+|회의실 상세|
 |:---:|
-|<img src="https://github.com/user-attachments/assets/d321783d-628f-48d4-9034-13e784fb0be8" width="450"/>|
-|공간에 대한 상세 정보와 예약 현황을 확인할 수 있다. <br>테이블이 여러 개인 경우의 공간이다.|
+|<img src="https://github.com/user-attachments/assets/5fb24db8-a298-4a79-9c3c-3d9a2622c973" width="450"/>|
+|회의실에 대한 상세 정보와 예약 현황을 확인할 수 있다.|
 
-|공간 예약|
-|:---:|
-|<img src="https://github.com/user-attachments/assets/f5782884-3e41-4df0-8c8f-46a14af35414" width="450"/>|
-|공간을 예약하기 위한 페이지이다.|
 
-|공간 예약 확정|
+|회의실 예약 확정|
 |:---:|
-|<img src="https://github.com/user-attachments/assets/bc4ed583-f38a-4c6b-ad8e-b4c1278f46d4" width="450"/>|
-|공간 예약이 확정되면 볼 수 있는 내용이다.|
+|<img src="https://github.com/user-attachments/assets/933d030b-598a-40af-b851-cef70ea7d0e2" width="450"/>|
+|회의실 예약이 확정되면 볼 수 있는 내용이다.|
 
-|공간 예약 내역 조회 및 취소|
+|회의실 예약 내역 조회 및 취소|
 |:---:|
-|<img src="https://github.com/user-attachments/assets/7f4e3f9f-bce2-4fef-a379-2d7ab4418e68" width="450"/>|
-|공간 예약의 내용을 보고 취소하기 위한 페이지이다.|
+|<img src="https://github.com/user-attachments/assets/38a35956-144d-4034-adbe-c57c6767ae29" width="450"/>|
+|회의실 예약의 내용을 보고 취소하기 위한 페이지이다.|
 
-|공간 예약 내역 확인|
+|회의실 예약 내역 확인|
 |:---:|
-|<img src="https://github.com/user-attachments/assets/f607c159-a7e9-4d20-a2c4-028c277e0621" width="450"/>|
-|본인의 공간 내역을 확인할 수 있다.|
+|<img src="https://github.com/user-attachments/assets/e2153db6-840f-4c3e-bd9d-6b60bf6cf7c3" width="450"/>|
+|본인의 회의실 내역을 확인할 수 있다.|
 
 |회의실 예약 취소|
 |:---:|
-|<img src="https://github.com/user-attachments/assets/bb4372a2-1878-4ff0-a882-a42b7749f39f" width="450"/>|
-|본인의 공간 예약을 취소할 수 있다.|
+|<img src="https://github.com/user-attachments/assets/d039d359-e99e-4f98-8b35-6a826239dfcf" width="450"/>|
+|본인의 회의실 예약을 취소할 수 있다.|
 
 |프로젝트|
 |:---:|
-|<img src="https://github.com/user-attachments/assets/c8d480ca-1f3f-483b-bca6-912293cbcfff" width="450"/>|
+|<img src="https://github.com/user-attachments/assets/dbc3919c-a2f8-44f0-b103-53b78b38b84b" width="450"/>|
 |프로젝트에 대한 정보를 확인할 수 있다.|
 
 |프로젝트 상세|
 |:---:|
-|<img src="https://github.com/user-attachments/assets/dbd8bfa0-ac51-4894-9fac-d2812da4d57f" width="450"/>|
+|<img src="https://github.com/user-attachments/assets/e9ce29e2-0b36-4fea-a94a-b23335760087" width="450"/>|
 |프로젝트에 대한 상세정보를 확인할 수 있다.|
 
 
