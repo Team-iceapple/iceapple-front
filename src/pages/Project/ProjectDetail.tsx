@@ -99,13 +99,26 @@ const ProjectDetail = () => {
                     </div>
                 </div>
 
-                <div className={detailStyles.detailImageBox}>
+                <div className={detailStyles.detailImageBox} style={{ position: 'relative' }}>
                     {pdfBlobUrl ? (
-                        <iframe
-                            src={pdfBlobUrl}
-                            title="PDF 미리보기"
-                            style={{ width: '100%', height: '100%', border: 'none' }}
-                        />
+                        <>
+                            <iframe
+                                src={pdfBlobUrl}
+                                title="PDF 미리보기"
+                                style={{ width: '100%', height: '100%', border: 'none' }}
+                            />
+                            <div
+                                style={{
+                                    position: 'absolute',
+                                    top: 0,
+                                    left: 0,
+                                    width: "100%",
+                                    height: "100%",
+                                    zIndex: 10,
+                                    background: "transparent",
+                                }}
+                            />
+                        </>
                     ) : (
                         <p>PDF를 불러오는 중입니다...</p>
                     )}
