@@ -3,6 +3,7 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import Sidebar from '../Sidebar/Sidebar.tsx';
 import styles from './Layout.module.css';
 import { Footer } from '../Footer/Footer.tsx';
+import { getToggleFromSearch, setReservationEnabled } from '../../utils/reservationFlag';
 
 interface LayoutProps {
     children: React.ReactNode;
@@ -14,6 +15,19 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
     const navigate = useNavigate();
     const location = useLocation();
     const timeoutRef = useRef<number | null>(null);
+
+    // Capture ?reserve=on/off from the URL and persist to sessionStorage, then clean URL
+    useEffect(() => {
+        const toggle = getToggleFromSearch(location.search);
+        if (toggle !== null) {
+            setReservationEnabled(toggle);
+            navigate(location.pathname, { replace: true });
+        } else if (!location.search && location.pathname === '/') {
+            // If visiting the root without any query, force-disable reservation
+            setReservationEnabled(false);
+        }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [location.search]);
 
     const resetTimer = useCallback(() => {
         if (timeoutRef.current !== null) {

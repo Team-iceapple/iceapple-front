@@ -3,15 +3,14 @@ import { NavLink, useNavigate, useLocation } from 'react-router-dom';
 import { Icon } from '@iconify/react';
 import logo from '/logo.svg';
 import styles from './Sidebar.module.css';
+import { isReservationEnabled } from '../../utils/reservationFlag';
 
 const Sidebar = () => {
     const navigate = useNavigate();
     const location = useLocation();
     const [openNotice, setOpenNotice] = useState(false);
-    const [openDashboard, setOpenDashboard] = useState(false);
     const groupRef = useRef(null);
     const navRef = useRef<HTMLDivElement | null>(null);
-    const dashboardSubRef = useRef<HTMLDivElement | null>(null);
 
     useEffect(() => {
         const onClickOutside = () => {
@@ -36,29 +35,7 @@ const Sidebar = () => {
             location.pathname.startsWith('/notice') ||
             location.pathname.startsWith('/sojoong');
         setOpenNotice(isNoticePath);
-
-        const isDashboardPath = location.pathname.startsWith('/dashboard');
-        setOpenDashboard(isDashboardPath);
     }, [location.pathname]);
-
-    const scrollNavToBottom = useCallback(() => {
-        const container = navRef.current;
-        if (!container) return;
-        try {
-            container.scrollTo({ top: container.scrollHeight, behavior: 'smooth' });
-        } catch {
-            container.scrollTop = container.scrollHeight;
-        }
-    }, []);
-
-    useEffect(() => {
-        if (!openDashboard) return;
-        // Scroll after DOM updates
-        requestAnimationFrame(scrollNavToBottom);
-        // Scroll again after submenu transition (~180ms)
-        const t = setTimeout(scrollNavToBottom, 220);
-        return () => clearTimeout(t);
-    }, [openDashboard, scrollNavToBottom]);
 
     const safeNav = useCallback(
         (path) => {
@@ -149,15 +126,29 @@ const Sidebar = () => {
                     </div>
                 </div>
 
-                <NavLink
-                    to="/rooms"
-                    className={({ isActive }) =>
-                        `${styles.link} ${isActive ? styles.active : ''}`
-                    }
-                >
-                    <Icon icon="lucide:calendar" className={styles.icon} />
-                    회의실 예약
-                </NavLink>
+                {isReservationEnabled() ? (
+                    <NavLink
+                        to="/rooms"
+                        className={({ isActive }) =>
+                            `${styles.link} ${isActive ? styles.active : ''}`
+                        }
+                    >
+                        <Icon icon="lucide:calendar" className={styles.icon} />
+                        회의실 예약
+                    </NavLink>
+                ) : (
+                    <button
+                        type="button"
+                        className={styles.link}
+                        disabled
+                        aria-disabled="true"
+                        title="특수 링크로 접근해야 활성화됩니다 (?reserve=on)"
+                        style={{ cursor: 'not-allowed', opacity: 0.6 }}
+                    >
+                        <Icon icon="lucide:calendar" className={styles.icon} />
+                        회의실 예약
+                    </button>
+                )}
 
                 <NavLink
                     to="/works"
@@ -169,67 +160,19 @@ const Sidebar = () => {
                     졸업작품
                 </NavLink>
 
-                <div className={styles.group}>
-                    <button
-                        type="button"
-                        className={`${styles.link} ${
-                            location.pathname.startsWith('/dashboard') ? styles.activeSoft : ''
-                        }`}
-                        aria-expanded={openDashboard}
-                        aria-controls="dashboard-submenu"
-                        onClick={(e) => {
-                            e.stopPropagation();
-                            setOpenDashboard((v) => !v);
-                        }}
-                    >
-                        <Icon icon="lucide:layout-dashboard" className={styles.icon} />
-                        강의실 IAQ
-                        <Icon
-                            icon="lucide:chevron-down"
-                            className={`${styles.caret} ${openDashboard ? styles.caretOpen : ''}`}
-                        />
-                    </button>
-
-                    <div
-                        id="dashboard-submenu"
-                        role="menu"
-                        aria-label="대시보드 하위 메뉴"
-                        className={`${styles.submenuWrap} ${
-                            openDashboard ? styles.submenuOpen : ''
-                        }`}
-                        ref={dashboardSubRef}
-                    >
-                        <NavLink
-                            to="/dashboard/link1"
-                            role="menuitem"
-                            className={({ isActive }) =>
-                                `${styles.sublink} ${isActive ? styles.subActive : ''}`
-                            }
-                            onClick={(e) => {
-                                e.preventDefault();
-                                safeNav('/dashboard/link1');
-                            }}
-                        >
-                            <span className={styles.bullet} />
-                            실시간 공기질 정보
-                        </NavLink>
-
-                        <NavLink
-                            to="/dashboard/link2"
-                            role="menuitem"
-                            className={({ isActive }) =>
-                                `${styles.sublink} ${isActive ? styles.subActive : ''}`
-                            }
-                            onClick={(e) => {
-                                e.preventDefault();
-                                safeNav('/dashboard/link2');
-                            }}
-                        >
-                            <span className={styles.bullet} />
-                            환경 변화 그래프
-                        </NavLink>
-                    </div>
-                </div>
+				<NavLink
+					to="/dashboard/link1"
+					className={({ isActive }) =>
+						`${styles.link} ${isActive ? styles.active : ''}`
+					}
+					onClick={(e) => {
+						e.preventDefault();
+						safeNav('/dashboard/link1');
+					}}
+				>
+					<Icon icon="lucide:layout-dashboard" className={styles.icon} />
+					강의실 IAQ
+				</NavLink>
             </nav>
         </aside>
     );

@@ -9,6 +9,7 @@ import axios from "axios";
 import baseStyles from "../Project/Project.module.css";
 import reservationStyles from "./RoomReservation.module.css";
 import Modal from "../../components/Modal/Modal";
+import { isReservationEnabled } from "../../utils/reservationFlag";
 
 const API_BASE_URL = `${import.meta.env.VITE_API_BASE_URL}place/`;
 
@@ -73,6 +74,8 @@ const RoomReservation = () => {
     const showGhost = rooms.length <= PAGE_SIZE;
     const canPrev = page > 0 && !showGhost;
     const canNext = page < pageCount - 1 && !showGhost;
+
+    const reservationEnabled = isReservationEnabled();
 
     useEffect(() => {
         if (!rooms.length || !roomId) return;
@@ -418,10 +421,15 @@ const RoomReservation = () => {
                         <button
                             className={reservationStyles.Button}
                             onClick={() => setModalOpen(true)}
-                            disabled={selectedTime.length === 0 || !roomId}
+                            disabled={!reservationEnabled || selectedTime.length === 0 || !roomId}
                         >
                             예약하기
                         </button>
+                        {!reservationEnabled && (
+                            <div className="text-muted mt-2" role="note">
+                                특수 링크로 접근해야 예약하기 버튼이 활성화됩니다. URL에 <code>?reserve=on</code>을 포함해 접속하세요.
+                            </div>
+                        )}
                     </div>
 
                     {error && <div className="text-danger mt-2">{error}</div>}
