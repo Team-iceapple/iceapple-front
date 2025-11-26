@@ -3,7 +3,7 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import Sidebar from '../Sidebar/Sidebar.tsx';
 import styles from './Layout.module.css';
 import { Footer } from '../Footer/Footer.tsx';
-import { getToggleFromSearch, setReservationEnabled } from '../../utils/reservationFlag';
+import { getToggleFromSearch, setReservationEnabled, getReservationEnabled } from '../../utils/reservationFlag';
 
 interface LayoutProps {
     children: React.ReactNode;
@@ -16,18 +16,36 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
     const location = useLocation();
     const timeoutRef = useRef<number | null>(null);
 
-    // Capture ?reserve=on/off from the URL and persist to sessionStorage, then clean URL
+    useEffect(() => {
+        if (location.search) return;
+        const path = location.pathname || '/';
+        const qIdx = path.indexOf('？');
+        if (qIdx === -1) return;
+        const base = path.slice(0, qIdx) || '/';
+        const raw = path.slice(qIdx + 1);
+        if (!raw) return;
+        navigate(`${base}?${raw}`, { replace: true });
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [location.pathname, location.search]);
+
+    useEffect(() => {
+        const saved = getReservationEnabled();
+        if (saved !== null) {
+            setReservationEnabled(saved);
+        } else {
+            // setReservationEnabled(false);
+        }
+    }, []);
+
     useEffect(() => {
         const toggle = getToggleFromSearch(location.search);
         if (toggle !== null) {
             setReservationEnabled(toggle);
             navigate(location.pathname, { replace: true });
-        } else if (!location.search && location.pathname === '/') {
-            // If visiting the root without any query, force-disable reservation
-            setReservationEnabled(false);
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [location.search]);
+
 
     const resetTimer = useCallback(() => {
         if (timeoutRef.current !== null) {
